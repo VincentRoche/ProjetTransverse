@@ -1,2 +1,2 @@
 # ProjetTransverse
-équipe eyjafjallajökull
+*Équipe Eyjafjallajökull*
