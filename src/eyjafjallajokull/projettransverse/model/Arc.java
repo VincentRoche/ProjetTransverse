@@ -23,3 +23,4 @@ public class Arc {
 		return Math.hypot(extremite1.getCoordonneeX() - extremite2.getCoordonneeX(), extremite1.getCoordonneeY() - extremite2.getCoordonneeY());
 	}
 }
+//bonjour
