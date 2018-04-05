@@ -26,4 +26,19 @@ public class Station {
 	public int getCoordonneeY() {
 		return coordonneeY;
 	}
+	
+	/**
+	 * Retourne la distance entre cette station et la station donnée.
+	 * @param autreStation Station pour laquelle on veut la distance.
+	 * @return Distance entre les deux stations.
+	 */
+	public double distance(Station autreStation)
+	{
+		return Math.hypot(this.getCoordonneeX() - autreStation.getCoordonneeX(), this.getCoordonneeY() - autreStation.getCoordonneeY());
+	}
+
+	@Override
+	public String toString() {
+		return "Station [X=" + coordonneeX + ", Y=" + coordonneeY + "]";
+	}
 }

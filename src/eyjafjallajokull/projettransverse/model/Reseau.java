@@ -1,5 +1,6 @@
 package eyjafjallajokull.projettransverse.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,6 +9,7 @@ import java.util.List;
 public class Reseau {
 	private List<Station> stations;
 	private List<Arc> arcs;
+	private List<Voyageur> voyageurs;
 	private int xMax, yMax;
 	
 	/**
@@ -17,6 +19,9 @@ public class Reseau {
 	public Reseau(int xMax, int yMax) {
 		this.xMax = xMax;
 		this.yMax = yMax;
+		this.stations = new ArrayList<Station>();
+		this.arcs = new ArrayList<Arc>();
+		this.voyageurs = new ArrayList<Voyageur>();
 	}
 	
 	/**
@@ -44,5 +49,46 @@ public class Reseau {
 		Station s = new Station(coordonneeX, coordonneeY);
 		if (!stations.contains(s)) // TODO Implémenter comparaison
 			stations.add(s);
+	}
+	
+	public void ajouterVoyageur(Station origine, Station destination)
+	{
+		Voyageur v = new Voyageur(origine, destination);
+		voyageurs.add(v);
+	}
+
+	/**
+	 * @return Stations du réseau.
+	 */
+	public List<Station> getStations() {
+		return new ArrayList<Station>(stations);
+	}
+
+	/**
+	 * @return Arcs du réseau.
+	 */
+	public List<Arc> getArcs() {
+		return new ArrayList<Arc>(arcs);
+	}
+
+	/**
+	 * @return Voyageurs.
+	 */
+	public List<Voyageur> getVoyageurs() {
+		return new ArrayList<Voyageur>(voyageurs);
+	}
+
+	/**
+	 * @return Coordonnée X maximale du réseau.
+	 */
+	public int getxMax() {
+		return xMax;
+	}
+
+	/**
+	 * @return Coordonnée Y maximale du réseau.
+	 */
+	public int getyMax() {
+		return yMax;
 	}
 }
