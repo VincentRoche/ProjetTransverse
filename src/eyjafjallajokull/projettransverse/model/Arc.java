@@ -22,4 +22,9 @@ public class Arc {
 	{
 		return extremite1.distance(extremite2);
 	}
+
+	@Override
+	public String toString() {
+		return "Arc [extremite1=" + extremite1 + ", extremite2=" + extremite2 + ", ligne=" + ligne + "]";
+	}
 }

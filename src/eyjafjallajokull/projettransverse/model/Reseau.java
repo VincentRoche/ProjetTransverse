@@ -10,6 +10,7 @@ public class Reseau {
 	private List<Station> stations;
 	private List<Arc> arcs;
 	private List<Voyageur> voyageurs;
+	private List<Ligne> lignes;
 	private int xMax, yMax;
 	
 	/**
@@ -22,6 +23,7 @@ public class Reseau {
 		this.stations = new ArrayList<Station>();
 		this.arcs = new ArrayList<Arc>();
 		this.voyageurs = new ArrayList<Voyageur>();
+		this.lignes = new ArrayList<Ligne>();
 	}
 	
 	/**
@@ -51,10 +53,27 @@ public class Reseau {
 			stations.add(s);
 	}
 	
+	/**
+	 * Ajoute un voyager avec son origine et sa destination.
+	 * @param origine Station d'où part le voyageur.
+	 * @param destination Station où il va.
+	 */
 	public void ajouterVoyageur(Station origine, Station destination)
 	{
 		Voyageur v = new Voyageur(origine, destination);
 		voyageurs.add(v);
+	}
+	
+	/**
+	 * Ajoute une ligne (mais pas ses arcs)
+	 * @param numero Numéro de la ligne
+	 * @return Ligne créée.
+	 */
+	public Ligne ajouterLigne(int numero)
+	{
+		Ligne l = new Ligne(numero);
+		lignes.add(l);
+		return l;
 	}
 
 	/**
@@ -76,6 +95,13 @@ public class Reseau {
 	 */
 	public List<Voyageur> getVoyageurs() {
 		return new ArrayList<Voyageur>(voyageurs);
+	}
+	
+	/**
+	 * @return Lignes du réseau.
+	 */
+	public List<Ligne> getLignes() {
+		return new ArrayList<Ligne>(lignes);
 	}
 
 	/**

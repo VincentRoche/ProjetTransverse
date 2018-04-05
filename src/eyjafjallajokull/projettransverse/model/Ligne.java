@@ -11,4 +11,9 @@ public class Ligne {
 		this.numero = numero;
 	}
 
+	@Override
+	public String toString() {
+		return "Ligne [numero=" + numero + "]";
+	}
+
 }
