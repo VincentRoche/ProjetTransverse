@@ -6,6 +6,7 @@ import java.util.Random;
 import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.model.Station;
 import eyjafjallajokull.projettransverse.model.Voyageur;
+import eyjafjallajokull.projettransverse.view.FenetrePlan;
 
 public class Test {
 
@@ -40,6 +41,9 @@ public class Test {
 		{
 			System.out.println(v);
 		}
+		
+		// Fenêtre
+		FenetrePlan f = new FenetrePlan(reseau);
 	}
 
 }
