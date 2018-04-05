@@ -33,4 +33,16 @@ public class Reseau {
 		if (!arcs.contains(a)) // TODO Implémenter la comparaison pour les différents objets.
 			arcs.add(a);
 	}
+	
+	/**
+	 * Ajoute une station au réseau, pas liée aux autres.
+	 * @param coordonneeX Coordonnée X de la station.
+	 * @param coordonneeY Coordonnée Y de la station.
+	 */
+	public void ajouterStation(int coordonneeX, int coordonneeY)
+	{
+		Station s = new Station(coordonneeX, coordonneeY);
+		if (!stations.contains(s)) // TODO Implémenter comparaison
+			stations.add(s);
+	}
 }
