@@ -10,6 +10,8 @@ import eyjafjallajokull.projettransverse.model.Station;
 
 public class PanelStations extends JPanel {
 
+	private static final long serialVersionUID = -2312529314961684770L;
+
 	//Attributs
 	private final Reseau reseau;
 

@@ -117,4 +117,12 @@ public class Reseau {
 	public int getyMax() {
 		return yMax;
 	}
+	
+	/**
+	 * Evalue l'efficacité du réseau en simulant les trajets des voyageurs.
+	 * @return Moyenne des temps de parcours des voyageurs
+	 */
+	public float evaluer() {
+		return 0;
+	}
 }
