@@ -22,6 +22,20 @@ public class Arc {
 	{
 		return extremite1.distance(extremite2);
 	}
+	
+	/**
+	 * @return L'emplacement source.
+	 */
+	public Station getExtremite1() {
+		return extremite1;
+	}
+	
+	/**
+	 * @return L'emplacement cible.
+	 */
+	public Station getExtremite2() {
+		return extremite2;
+	}
 
 	@Override
 	public String toString() {
