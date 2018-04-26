@@ -11,7 +11,7 @@ import eyjafjallajokull.projettransverse.model.Arc;
 import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.model.Station;
 
-public class PanelStations extends JPanel {
+public class PanelReseau extends JPanel {
 
 	private static final long serialVersionUID = -2312529314961684770L;
 
@@ -22,7 +22,7 @@ public class PanelStations extends JPanel {
 	private static final int EPAISSEUR_TRAIT = 3;
 
 	//Constructeurs
-	public PanelStations(Reseau reseau) {
+	public PanelReseau(Reseau reseau) {
 		this.reseau = reseau;
 	}
 

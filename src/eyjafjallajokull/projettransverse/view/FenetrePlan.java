@@ -21,7 +21,7 @@ public class FenetrePlan extends JFrame {
         setLocationRelativeTo(null); 
         setResizable(false); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(new PanelStations(reseau));
+        add(new PanelReseau(reseau));
         setVisible(true);
   }
 }
