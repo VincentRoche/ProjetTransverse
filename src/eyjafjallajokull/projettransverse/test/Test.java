@@ -9,6 +9,11 @@ import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.model.Station;
 import eyjafjallajokull.projettransverse.model.Voyageur;
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 
 public class Test {
 
@@ -16,6 +21,56 @@ public class Test {
 		int tailleMax = 500;
 		Reseau reseau = new Reseau(tailleMax, tailleMax);
 		
+                                    //Lecture fichier Station
+                                    String pathFichier="station.txt";
+
+                                    BufferedReader fluxEntree=null;
+                                    try {
+                                            fluxEntree = new BufferedReader(new FileReader(pathFichier));
+
+                                            String ligneLue = null;
+                                            String[] station = null;
+
+                                            while((ligneLue = fluxEntree.readLine())!=null){
+                                                      station = ligneLue.split(" ");
+                                                      for(String mot : station){
+                                                               System.out.println(mot);
+                                                      }                              
+                                            }
+                                    }
+                                    catch(IOException exc){
+                                            exc.printStackTrace();
+                                    }
+                                    finally{
+                                            try{
+                                                    if(fluxEntree!=null){
+                                                            /* Fermeture du flux vers le fichier */
+                                                            fluxEntree.close();
+                                                    }
+                                            }
+                                            catch(IOException e){
+                                                    e.printStackTrace();
+                                            }
+                                    }
+                                    
+                                    
+                                   /* try {
+                                            File file = new File("station.txt");
+                                            LineNumberReader reader = new LineNumberReader(new FileReader(file));
+                                            String ligne = "";
+                                            //String station[];
+                                            while (ligne != null){
+                                                    String station[] = reader.readLine().split(" ");
+                                                    System.out.println(station[1] + " ( " + station[2] + ", " + station[3] + " )");
+
+                                            }
+                                    }
+                                    catch (IOException ex) {
+                                    }*/
+                                    
+                                     
+                
+                
 		// Stations aléatoires
 		int nbStations = 10;
 		Random rand = new Random();
