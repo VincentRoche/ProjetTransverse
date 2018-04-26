@@ -21,7 +21,7 @@ public class Test {
 		Random rand = new Random();
 		for (int i=0; i < nbStations; i++)
 		{
-			reseau.ajouterStation(rand.nextInt(tailleMax), rand.nextInt(tailleMax));
+			reseau.ajouterStation(rand.nextInt(tailleMax), rand.nextInt(tailleMax), "villejuif");
 		}
 		List<Station> stations = reseau.getStations();
 		
