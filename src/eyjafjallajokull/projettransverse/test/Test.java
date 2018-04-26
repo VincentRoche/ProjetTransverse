@@ -10,10 +10,8 @@ import eyjafjallajokull.projettransverse.model.Station;
 import eyjafjallajokull.projettransverse.model.Voyageur;
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 
 public class Test {
 
@@ -29,13 +27,12 @@ public class Test {
                                             fluxEntree = new BufferedReader(new FileReader(pathFichier));
 
                                             String ligneLue = null;
-                                            String[] station = null;
+                                            String station [] = null;
 
                                             while((ligneLue = fluxEntree.readLine())!=null){
                                                       station = ligneLue.split(" ");
-                                                      for(String mot : station){
-                                                               System.out.println(mot);
-                                                      }                              
+                                                      
+                                                      reseau.ajouterStation(Integer.parseInt(station[1]), Integer.parseInt(station[2]), station[0]);                         
                                             }
                                     }
                                     catch(IOException exc){
@@ -52,32 +49,14 @@ public class Test {
                                                     e.printStackTrace();
                                             }
                                     }
-                                    
-                                    
-                                   /* try {
-                                            File file = new File("station.txt");
-                                            LineNumberReader reader = new LineNumberReader(new FileReader(file));
-                                            String ligne = "";
-                                            //String station[];
-                                            while (ligne != null){
-                                                    String station[] = reader.readLine().split(" ");
-                                                    System.out.println(station[1] + " ( " + station[2] + ", " + station[3] + " )");
 
-                                            }
-                                    }
-                                    catch (IOException ex) {
-                                    }*/
-                                    
-                                     
-                
-                
 		// Stations aléatoires
 		int nbStations = 10;
 		Random rand = new Random();
-		for (int i=0; i < nbStations; i++)
+		/*for (int i=0; i < nbStations; i++)
 		{
 			reseau.ajouterStation(rand.nextInt(tailleMax), rand.nextInt(tailleMax), "villejuif");
-		}
+		}*/
 		List<Station> stations = reseau.getStations();
 		
 		// Ligne qui relie tout
