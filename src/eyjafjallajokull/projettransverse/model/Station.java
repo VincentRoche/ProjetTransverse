@@ -7,10 +7,12 @@ public class Station {
 
 	private final int coordonneeX;
 	private final int coordonneeY;
+                  private final String nom;
 
-	Station(int coordonneeX, int coordonneeY) {
+	Station(int coordonneeX, int coordonneeY, String nom) {
 		this.coordonneeX = coordonneeX;
 		this.coordonneeY = coordonneeY;
+                                    this.nom = nom;
 	}
 
 	/**
@@ -39,6 +41,6 @@ public class Station {
 
 	@Override
 	public String toString() {
-		return "Station [X=" + coordonneeX + ", Y=" + coordonneeY + "]";
+		return "Station " + nom + " [X=" + coordonneeX + ", Y=" + coordonneeY + "]";
 	}
 }

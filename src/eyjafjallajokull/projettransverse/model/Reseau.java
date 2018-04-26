@@ -46,9 +46,9 @@ public class Reseau {
 	 * @param coordonneeX Coordonnée X de la station.
 	 * @param coordonneeY Coordonnée Y de la station.
 	 */
-	public void ajouterStation(int coordonneeX, int coordonneeY)
+	public void ajouterStation(int coordonneeX, int coordonneeY, String nom)
 	{
-		Station s = new Station(coordonneeX, coordonneeY);
+		Station s = new Station(coordonneeX, coordonneeY, nom);
 		if (!stations.contains(s)) // TODO Implémenter comparaison
 			stations.add(s);
 	}
