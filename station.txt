@@ -1,3 +1,4 @@
 villejuif 45 25
 vitry 120 95
 ivry 84 140
+paris 250 148
