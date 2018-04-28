@@ -15,6 +15,15 @@ import java.io.IOException;
 
 public class Test {
 
+	public static Station recherche(Reseau reseau, String nom){
+		 for (Station s : reseau.getStations()){
+			if (s.getNom().equals(nom)){
+				return s;
+			}
+		  }
+		  return null;        
+	  }
+	
 	public static void main(String[] args) {
 		int tailleMax = 500;
 		Reseau reseau = new Reseau(tailleMax, tailleMax);
@@ -49,6 +58,39 @@ public class Test {
                                                     e.printStackTrace();
                                             }
                                     }
+		//Lecture fichier trajet
+                pathFichier="trajet.txt";
+
+                /*BufferedReader */fluxEntree=null;
+		try {
+		    fluxEntree = new BufferedReader(new FileReader(pathFichier));
+
+		    String ligneLue = null;
+		    String trajet [] = null;
+
+		    while((ligneLue = fluxEntree.readLine())!=null){
+			      trajet = ligneLue.split(" ");
+
+			      for (int i=0; i < Integer.parseInt(trajet[2]); i++)
+				{
+					reseau.ajouterVoyageur(recherche(reseau, trajet[0]), recherche(reseau, trajet[1]));
+				}                  
+			    }
+		    }
+		    catch(IOException exc){
+			    exc.printStackTrace();
+		    }
+		    finally{
+			    try{
+				    if(fluxEntree!=null){
+					    /* Fermeture du flux vers le fichier */
+					    fluxEntree.close();
+				    }
+			    }
+			    catch(IOException e){
+				    e.printStackTrace();
+			    }
+		    }
 
 		// Stations aléatoires
 		int nbStations = 10;
@@ -67,14 +109,14 @@ public class Test {
 		}
 		
 		// Voyageurs aléatoires
-		for (Station s : stations)
+		/*for (Station s : stations)
 		{
 			// Nombre aléatoire
 			for (int i=0; i < rand.nextInt(10); i++)
 			{
 				reseau.ajouterVoyageur(s, stations.get(rand.nextInt(stations.size())));
 			}
-		}
+		}*/
 		
 		// Affichage
 		for (Station s : stations)
