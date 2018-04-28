@@ -29,6 +29,10 @@ public class Station {
 		return coordonneeY;
 	}
 	
+	public String getNom(){
+		return nom;
+	}
+	
 	/**
 	 * Retourne la distance entre cette station et la station donnée.
 	 * @param autreStation Station pour laquelle on veut la distance.
