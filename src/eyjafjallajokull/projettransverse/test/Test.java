@@ -102,11 +102,17 @@ public class Test {
 		List<Station> stations = reseau.getStations();
 
 		// Ligne qui relie tout
-		Ligne l = reseau.ajouterLigne(1);
+		Ligne l = reseau.ajouterLigne();
 		for (int i=1; i < stations.size(); i++)
 		{
 			reseau.ajouterArc(stations.get(i), stations.get(i - 1), l);
 		}
+		
+		// Ligne entre 3 stations
+		Ligne l2 = reseau.ajouterLigne();
+		reseau.ajouterArc(stations.get(0), stations.get(2), l2);
+		reseau.ajouterArc(stations.get(2), stations.get(8), l2);
+		reseau.ajouterArc(stations.get(8), stations.get(6), l2);
 
 		// Voyageurs aléatoires
 		/*for (Station s : stations)

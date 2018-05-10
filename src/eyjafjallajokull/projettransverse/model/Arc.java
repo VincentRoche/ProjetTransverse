@@ -37,6 +37,13 @@ public class Arc {
 		return extremite2;
 	}
 
+	/**
+	 * @return Ligne correspondante à l'arc.
+	 */
+	public Ligne getLigne() {
+		return ligne;
+	}
+
 	@Override
 	public String toString() {
 		return "Arc [extremite1=" + extremite1 + ", extremite2=" + extremite2 + ", ligne=" + ligne + "]";

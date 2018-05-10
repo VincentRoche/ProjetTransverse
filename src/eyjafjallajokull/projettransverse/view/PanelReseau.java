@@ -18,8 +18,8 @@ public class PanelReseau extends JPanel {
 	//Attributs
 	private final Reseau reseau;
 
-	private static final int TAILLE_ROND = 30;
-	private static final int EPAISSEUR_TRAIT = 3;
+	private static final int TAILLE_ROND = 25;
+	private static final int EPAISSEUR_TRAIT = 5;
 
 	//Constructeurs
 	public PanelReseau(Reseau reseau) {
@@ -30,7 +30,7 @@ public class PanelReseau extends JPanel {
 		// Affichage de chaque arc
 		for (Arc a : reseau.getArcs())
 		{
-			Color Stationcolor = new Color(153, 0, 51);
+			Color Stationcolor = a.getLigne().getCouleur();
 			g.setColor(Stationcolor) ;
 			int xb = a.getExtremite1().getCoordonneeX();
 			int yb = a.getExtremite1().getCoordonneeY();
@@ -45,7 +45,7 @@ public class PanelReseau extends JPanel {
 		// Affichage de chaque station
 		for (Station s : reseau.getStations())
 		{
-			Color Stationcolor = new Color(153, 0, 51);
+			Color Stationcolor = new Color(0, 0, 0);
 			g.setColor(Stationcolor) ;
 			int xb = s.getCoordonneeX() - TAILLE_ROND / 2;
 			int yb = s.getCoordonneeY() - TAILLE_ROND / 2;

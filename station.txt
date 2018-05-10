@@ -2,3 +2,8 @@ villejuif 45 25
 vitry 120 95
 ivry 84 140
 paris 250 148
+aaa 300 200
+bbb 400 210
+ccc 200 300
+ddd 400 400
+eee 100 333

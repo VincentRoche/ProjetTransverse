@@ -66,12 +66,11 @@ public class Reseau {
 	
 	/**
 	 * Ajoute une ligne (mais pas ses arcs)
-	 * @param numero Numéro de la ligne
 	 * @return Ligne créée.
 	 */
-	public Ligne ajouterLigne(int numero)
+	public Ligne ajouterLigne()
 	{
-		Ligne l = new Ligne(numero);
+		Ligne l = new Ligne();
 		lignes.add(l);
 		return l;
 	}
