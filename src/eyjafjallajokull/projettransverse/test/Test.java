@@ -108,11 +108,15 @@ public class Test {
 			reseau.ajouterArc(stations.get(i), stations.get(i - 1), l);
 		}
 		
-		// Ligne entre 3 stations
+		// Ligne entre 4 stations
 		Ligne l2 = reseau.ajouterLigne();
 		reseau.ajouterArc(stations.get(0), stations.get(2), l2);
 		reseau.ajouterArc(stations.get(2), stations.get(8), l2);
 		reseau.ajouterArc(stations.get(8), stations.get(6), l2);
+		
+		// Ligne entre 2 stations
+		Ligne l3 = reseau.ajouterLigne();
+		reseau.ajouterArc(stations.get(0), stations.get(7), l3);
 
 		// Voyageurs aléatoires
 		/*for (Station s : stations)

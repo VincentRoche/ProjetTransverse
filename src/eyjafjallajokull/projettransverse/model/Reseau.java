@@ -108,6 +108,21 @@ public class Reseau {
 	}
 
 	/**
+	 * Retourne un arc existant avec les deux extrêmités données.
+	 * @param extremite1
+	 * @param extremite2
+	 * @return Arc avec les bonnes extrêmités (quel que soit leur ordre)
+	 */
+	public Arc getArc(Station extremite1, Station extremite2) {
+		for (Arc a : arcs)
+		{
+			if ((a.getExtremite1().equals(extremite1) && a.getExtremite2().equals(extremite2)) || (a.getExtremite1().equals(extremite2) && a.getExtremite2().equals(extremite1)))
+				return a;
+		}
+		return null;
+	}
+
+	/**
 	 * @return Voyageurs.
 	 */
 	public List<Voyageur> getVoyageurs() {
@@ -145,13 +160,13 @@ public class Reseau {
 			if (voyageur.getOrigine().getCheminCourt(voyageur.getDestination()) == null) // Si le trajet le plus court n'a pas encore été calculé
 			{
 				new Dijkstra(voyageur.getOrigine()).calculerChemins();
-				System.out.print("Chemin de " + voyageur.getOrigine().getNom() + " à " + voyageur.getDestination().getNom() + " :");
-				for (Station s : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
-				{
-					System.out.print(" " + s.getNom());
-				}
-				System.out.println("");
 			}
+			System.out.print("Chemin de " + voyageur.getOrigine().getNom() + " à " + voyageur.getDestination().getNom() + " :");
+			for (Station s : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
+			{
+				System.out.print(" " + s.getNom());
+			}
+			System.out.println("");
 		}
 		return 0;
 	}
@@ -162,6 +177,8 @@ public class Reseau {
 	 */
 	private class Dijkstra
 	{
+		/** Temps ajouté par un changement de ligne dans un trajet. */
+		private final static int MALUS_CORRESPONDANCE = 100;
 		private Station depart;
 		private Map<Station, Integer> distances;
 		private Map<Station, Station> predecesseurs;
@@ -229,9 +246,16 @@ public class Reseau {
 
 		private void maj_distances(Station s1, Station s2, Arc a)
 		{
-			if (distances.get(s2) > distances.get(s1) + a.getLongueur())
+			int longueurA = (int) Math.round(a.getLongueur());
+			// Si passer par ce nouvel arc fait changer de ligne, malus
+			Arc arcPrecedent = getArc(predecesseurs.get(s1), s1);
+			if (!s1.equals(depart) && !a.getLigne().equals(arcPrecedent.getLigne()))
 			{
-				distances.put(s2, distances.get(s1) + a.getLongueur());
+				longueurA += MALUS_CORRESPONDANCE;
+			}
+			if (distances.get(s2) > distances.get(s1) + longueurA)
+			{
+				distances.put(s2, distances.get(s1) + longueurA);
 				predecesseurs.put(s2, s1);
 			}
 		}

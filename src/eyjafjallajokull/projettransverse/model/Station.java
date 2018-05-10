@@ -61,9 +61,9 @@ public class Station {
 	 * @param autreStation Station pour laquelle on veut la distance.
 	 * @return Distance entre les deux stations.
 	 */
-	public int distance(Station autreStation)
+	public double distance(Station autreStation)
 	{
-		return (int) Math.hypot(this.getCoordonneeX() - autreStation.getCoordonneeX(), this.getCoordonneeY() - autreStation.getCoordonneeY());
+		return Math.hypot(this.getCoordonneeX() - autreStation.getCoordonneeX(), this.getCoordonneeY() - autreStation.getCoordonneeY());
 	}
 
 	@Override
