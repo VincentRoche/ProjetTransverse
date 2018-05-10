@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import javax.swing.JPanel;
 
@@ -27,6 +28,8 @@ public class PanelReseau extends JPanel {
 	}
 
 	public void paintComponent(Graphics g) {
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Anticrénelage
+		
 		// Affichage de chaque arc
 		for (Arc a : reseau.getArcs())
 		{
