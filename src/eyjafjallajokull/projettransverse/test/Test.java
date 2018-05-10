@@ -140,6 +140,8 @@ public class Test {
 
 		// Fenêtre
 		FenetrePlan f = new FenetrePlan(reseau);
+		
+		reseau.evaluer();
 	}
 
 }

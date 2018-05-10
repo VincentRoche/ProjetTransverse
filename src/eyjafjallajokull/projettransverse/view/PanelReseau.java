@@ -28,7 +28,7 @@ public class PanelReseau extends JPanel {
 	}
 
 	public void paintComponent(Graphics g) {
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Anticrénelage
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Anti crénelage
 		
 		// Affichage de chaque arc
 		for (Arc a : reseau.getArcs())
@@ -53,6 +53,7 @@ public class PanelReseau extends JPanel {
 			int xb = s.getCoordonneeX() - TAILLE_ROND / 2;
 			int yb = s.getCoordonneeY() - TAILLE_ROND / 2;
 			g.fillOval(xb, yb, TAILLE_ROND, TAILLE_ROND);
+			g.drawString(s.getNom(), xb + TAILLE_ROND, yb);
 			g.setColor(Color.WHITE);
 			int ecart = TAILLE_ROND / 6;
 			g.fillOval(xb + ecart, yb + ecart, TAILLE_ROND - ecart * 2, TAILLE_ROND - ecart * 2);

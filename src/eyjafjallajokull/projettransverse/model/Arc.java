@@ -18,7 +18,7 @@ public class Arc {
 	/**
 	 * @return Distance entre les deux extrêmités de l'arc.
 	 */
-	public double getLongueur()
+	public int getLongueur()
 	{
 		return extremite1.distance(extremite2);
 	}
