@@ -16,6 +16,9 @@ public class Reseau {
 	private List<Ligne> lignes;
 	private int xMax, yMax;
 
+	/** Temps ajouté par un changement de ligne dans un trajet. */
+	public final static int TEMPS_CORRESPONDANCE = 100;
+
 	/**
 	 * @param xMax Taille maximale en X (le plus loin où une station peut être placée)
 	 * @param yMax Taille maximale en Y
@@ -40,7 +43,7 @@ public class Reseau {
 		// TODO Vérifier que chaque station n'a que un ou zéro arc pour la ligne donnée.
 
 		Arc a = new Arc(extremite1, extremite2, ligne);
-		if (!arcs.contains(a)) // TODO Implémenter la comparaison pour les différents objets.
+		if (!arcs.contains(a))
 			arcs.add(a);
 	}
 
@@ -52,7 +55,7 @@ public class Reseau {
 	public void ajouterStation(int coordonneeX, int coordonneeY, String nom)
 	{
 		Station s = new Station(coordonneeX, coordonneeY, nom);
-		if (!stations.contains(s)) // TODO Implémenter comparaison
+		if (!stations.contains(s))
 			stations.add(s);
 	}
 
@@ -93,7 +96,7 @@ public class Reseau {
 	}
 
 	/**
-	 * Retourne les arcs qui ont une station donnée comme extrêmité.
+	 * Retourne les arcs qui ont une station donnée comme extrémité.
 	 * @param s Station cherchée.
 	 * @return Arcs touchant cette station.
 	 */
@@ -108,10 +111,10 @@ public class Reseau {
 	}
 
 	/**
-	 * Retourne un arc existant avec les deux extrêmités données.
+	 * Retourne un arc existant avec les deux extrémités données.
 	 * @param extremite1
 	 * @param extremite2
-	 * @return Arc avec les bonnes extrêmités (quel que soit leur ordre)
+	 * @return Arc avec les bonnes extrémités (quel que soit leur ordre)
 	 */
 	public Arc getArc(Station extremite1, Station extremite2) {
 		for (Arc a : arcs)
@@ -154,7 +157,7 @@ public class Reseau {
 	 * Evalue l'efficacité du réseau en simulant les trajets des voyageurs.
 	 * @return Moyenne des temps de parcours des voyageurs
 	 */
-	public float evaluer() {
+	public double evaluer() {
 		for (Voyageur voyageur : voyageurs)
 		{
 			if (voyageur.getOrigine().getCheminCourt(voyageur.getDestination()) == null) // Si le trajet le plus court n'a pas encore été calculé
@@ -162,13 +165,48 @@ public class Reseau {
 				new Dijkstra(voyageur.getOrigine()).calculerChemins();
 			}
 			System.out.print("Chemin de " + voyageur.getOrigine().getNom() + " à " + voyageur.getDestination().getNom() + " :");
-			for (Station s : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
+			for (Arc s : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
 			{
-				System.out.print(" " + s.getNom());
+				System.out.print(" " + s);
 			}
 			System.out.println("");
 		}
-		return 0;
+
+		// Initialisation des trajets
+		long sommeLongueurs = 0;
+		for (Voyageur v : voyageurs)
+		{
+			v.initialiserTrajet();
+			sommeLongueurs += v.getLongueurTrajet();
+		}
+		int nbArrives = 0;
+		long sommeTemps = 0;
+		while (nbArrives < voyageurs.size())
+		{
+			// Remise des compteurs de voyageurs des arcs à 0
+			for (Arc a : arcs)
+			{
+				a.reinitialiserEntrees();
+			}
+			// Déplacement des voyageurs pas encore arrivés
+			for (Voyageur v : voyageurs)
+			{
+				if (!v.estArrive())
+				{
+					v.avancer();
+					if (v.estArrive())
+					{
+						nbArrives++;
+						sommeTemps += v.getTempsTrajet();
+					}
+				}
+			}
+		}
+
+		// Tout le monde est arrivé, calcul de la moyenne des temps de parcours
+		double moyenne = (float) sommeTemps / nbArrives;
+		System.out.println(sommeLongueurs / nbArrives);
+		return moyenne;
 	}
 
 
@@ -177,8 +215,6 @@ public class Reseau {
 	 */
 	private class Dijkstra
 	{
-		/** Temps ajouté par un changement de ligne dans un trajet. */
-		private final static int MALUS_CORRESPONDANCE = 100;
 		private Station depart;
 		private Map<Station, Integer> distances;
 		private Map<Station, Station> predecesseurs;
@@ -197,7 +233,7 @@ public class Reseau {
 			distances.put(depart, 0); // Sauf la station de départ qui est initialisée à 0
 		}
 
-		Map<Station, List<Station>> calculerChemins()
+		Map<Station, List<Arc>> calculerChemins()
 		{
 			List<Station> q = new ArrayList<Station>(stations); //Ensemble de tous les noeuds
 			while (!q.isEmpty())
@@ -212,15 +248,16 @@ public class Reseau {
 			}
 
 			// Récupération des chemins les plus courts pour chaque station
-			Map<Station, List<Station>> chemins = new HashMap<Station, List<Station>>();
+			Map<Station, List<Arc>> chemins = new HashMap<Station, List<Arc>>();
 			for (Station station : stations) // Pour chaque station de fin
 			{
-				List<Station> chemin = new ArrayList<Station>();
+				List<Arc> chemin = new ArrayList<Arc>();
 				Station s = station;
 				while (!s.equals(depart))
 				{
-					chemin.add(s);
-					s = predecesseurs.get(s);
+					Station s2 = predecesseurs.get(s);
+					chemin.add(getArc(s2, s));
+					s = s2;
 				}
 				Collections.reverse(chemin);
 				chemins.put(station, chemin);
@@ -251,7 +288,7 @@ public class Reseau {
 			Arc arcPrecedent = getArc(predecesseurs.get(s1), s1);
 			if (!s1.equals(depart) && !a.getLigne().equals(arcPrecedent.getLigne()))
 			{
-				longueurA += MALUS_CORRESPONDANCE;
+				longueurA += Reseau.TEMPS_CORRESPONDANCE;
 			}
 			if (distances.get(s2) > distances.get(s1) + longueurA)
 			{

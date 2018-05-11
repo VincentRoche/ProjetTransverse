@@ -11,7 +11,7 @@ public class Station {
 	private final int coordonneeX;
 	private final int coordonneeY;
 	private final String nom;
-	private Map<Station, List<Station>> cheminsCourts; // Chemins les plus courts pour aller de cette station à chaque station de la Map
+	private Map<Station, List<Arc>> cheminsCourts; // Chemins les plus courts pour aller de cette station à chaque station de la Map
 
 	Station(int coordonneeX, int coordonneeY, String nom) {
 		this.coordonneeX = coordonneeX;
@@ -45,15 +45,15 @@ public class Station {
 	 * @param arrivee Station de destination
 	 * @return Chemin allant à la station d'arrivée ou null s'il n'a pas été calculé.
 	 */
-	public List<Station> getCheminCourt(Station arrivee) {
+	public List<Arc> getCheminCourt(Station arrivee) {
 		return cheminsCourts != null ? cheminsCourts.get(arrivee) : null;
 	}
 
 	/**
-	 * @param cheminsCourts Chemins associés à chaque station d'arrivée
+	 * @param chemins Chemins associés à chaque station d'arrivée
 	 */
-	public void setCheminsCourts(Map<Station, List<Station>> cheminsCourts) {
-		this.cheminsCourts = cheminsCourts;
+	public void setCheminsCourts(Map<Station, List<Arc>> chemins) {
+		this.cheminsCourts = chemins;
 	}
 
 	/**
@@ -69,5 +69,13 @@ public class Station {
 	@Override
 	public String toString() {
 		return "Station " + nom + " [X=" + coordonneeX + ", Y=" + coordonneeY + "]";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Station))
+			return false;
+		Station s2 = (Station) obj;
+		return s2.coordonneeX == this.coordonneeX && s2.coordonneeY == this.coordonneeY;
 	}
 }

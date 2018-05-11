@@ -145,7 +145,7 @@ public class Test {
 		// Fenêtre
 		FenetrePlan f = new FenetrePlan(reseau);
 		
-		reseau.evaluer();
+		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
 	}
 
 }

@@ -31,4 +31,11 @@ public class Ligne {
 		return "Ligne [numero=" + numero + "]";
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Ligne))
+			return false;
+		return ((Ligne) obj).numero == numero;
+	}
+
 }
