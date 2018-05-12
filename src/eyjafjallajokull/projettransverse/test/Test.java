@@ -44,7 +44,7 @@ public class Test {
 				reseau.ajouterStation(Integer.parseInt(station[1]), Integer.parseInt(station[2]), station[0]);                         
 			}
 		}
-		catch(IOException exc){
+		catch(IOException exc) {
 			exc.printStackTrace();
 		}
 		finally{
@@ -68,7 +68,7 @@ public class Test {
 			String ligneLue = null;
 			String trajet [] = null;
 
-			while((ligneLue = fluxEntree.readLine())!=null){
+			while((ligneLue = fluxEntree.readLine())!=null) {
 				trajet = ligneLue.split(" ");
 
 				for (int i=0; i < Integer.parseInt(trajet[2]); i++)
