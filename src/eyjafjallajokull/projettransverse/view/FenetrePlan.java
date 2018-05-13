@@ -15,13 +15,20 @@ public class FenetrePlan extends JFrame {
         build();
     }
 	
-    private void build(){
+    private void build() {
         setTitle("Ligne de métro"); 
         setSize(reseau.getxMax(), reseau.getyMax()); 
         setLocationRelativeTo(null); 
         setResizable(false); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(new PanelReseau(reseau));
         setVisible(true);
+        majReseau();
   }
+
+	/**
+	 * Met à jour le plan affiché
+	 */
+	public void majReseau() {
+        setContentPane(new PanelReseau(reseau));
+	}
 }

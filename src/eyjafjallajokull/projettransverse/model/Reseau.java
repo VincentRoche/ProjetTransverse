@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Représente un réseau de stations et de lignes.
  */
-public class Reseau {
+public class Reseau implements Cloneable {
 	private List<Station> stations;
 	private List<Arc> arcs;
 	private List<Voyageur> voyageurs;
@@ -36,15 +36,34 @@ public class Reseau {
 	 * Lie deux stations du réseau par un arc.
 	 * @param extremite1 Station à un bout de l'arc.
 	 * @param extremite2 Station à l'autre bout de l'arc.
-	 * @param ligne Ligne correspondante à l'arc.
+	 * @param ligne Ligne correspondante à l'arc (peut être null dans certains algorithmes spécifiques).
+	 * @throws TropDArcsDeLaMemeLigneException Si une des extrémités est déjà liée à 2 arcs de la ligne donnée.
 	 */
-	public void ajouterArc(Station extremite1, Station extremite2, Ligne ligne)
+	public void ajouterArc(Station extremite1, Station extremite2, Ligne ligne) throws TropDArcsDeLaMemeLigneException
 	{
-		// TODO Vérifier que chaque station n'a que un ou zéro arc pour la ligne donnée.
+		if (ligne != null)
+		{
+			// Vérification que chaque station n'a que un ou zéro arc pour la ligne donnée.
+			int nbVoisins1 = 0, nbVoisins2 = 0;
+			for (Arc a : getArcsVoisins(extremite1))
+			{
+				if (a.getLigne().equals(ligne))
+					nbVoisins1++;
+			}
+			for (Arc a : getArcsVoisins(extremite2))
+			{
+				if (a.getLigne().equals(ligne))
+					nbVoisins2++;
+			}
+			if (nbVoisins1 > 1 || nbVoisins2 > 1)
+				throw new TropDArcsDeLaMemeLigneException();
+		}
 
 		Arc a = new Arc(extremite1, extremite2, ligne);
 		if (!arcs.contains(a))
+		{
 			arcs.add(a);
+		}
 	}
 
 	/**
@@ -87,6 +106,19 @@ public class Reseau {
 	public List<Station> getStations() {
 		return new ArrayList<Station>(stations);
 	}
+	
+	/**
+	 * @param nom Nom recherché
+	 * @return Station portant le nom cherché.
+	 */
+	public Station getStation(String nom) {
+		for (Station s : stations)
+		{
+			if (s.getNom().equals(nom))
+				return s;
+		}
+		return null;
+	}
 
 	/**
 	 * @return Arcs du réseau.
@@ -126,6 +158,15 @@ public class Reseau {
 	}
 
 	/**
+	 * Supprime un arc du graphe.
+	 * @param a Arc à supprimer.
+	 */
+	public void supprimerArc(Arc a)
+	{
+		arcs.remove(a);
+	}
+
+	/**
 	 * @return Voyageurs.
 	 */
 	public List<Voyageur> getVoyageurs() {
@@ -152,32 +193,62 @@ public class Reseau {
 	public int getyMax() {
 		return yMax;
 	}
+	
+	/**
+	 * @return Longueur totale du réseau (tous les arcs).
+	 */
+	public long getLongueur() {
+		long l = 0;
+		for (Arc a : arcs)
+		{
+			l += a.getLongueur();
+		}
+		return l;
+	}
 
 	/**
-	 * Evalue l'efficacité du réseau en simulant les trajets des voyageurs.
-	 * @return Moyenne des temps de parcours des voyageurs
+	 * Calcule les chemins les plus courts pour chaque station et voyageur (les résultats sont dans chaque station), et le flux de chaque arc.
 	 */
-	public double evaluer() {
+	public void calculerCheminsCourts()
+	{
+		// Réinitialisation des chemins les plus courts
+		for (Station s : stations)
+		{
+			s.viderCheminCourts();
+		}
+
+		// Réinitialisation des flux des arcs
+		for (Arc a : arcs)
+		{
+			a.reinitialiserFlux();
+		}
+
+		// Dijkstra
 		for (Voyageur voyageur : voyageurs)
 		{
 			if (voyageur.getOrigine().getCheminCourt(voyageur.getDestination()) == null) // Si le trajet le plus court n'a pas encore été calculé
 			{
 				new Dijkstra(voyageur.getOrigine()).calculerChemins();
 			}
-			System.out.print("Chemin de " + voyageur.getOrigine().getNom() + " à " + voyageur.getDestination().getNom() + " :");
-			for (Arc s : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
+			// Incrémentation du flux de chaque arc du chemin
+			for (Arc a : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
 			{
-				System.out.print(" " + s);
+				a.incrementerFlux();
 			}
-			System.out.println("");
 		}
+	}
+
+	/**
+	 * Evalue l'efficacité du réseau en simulant les trajets des voyageurs.
+	 * @return Moyenne des temps de parcours des voyageurs
+	 */
+	public double evaluer() {
+		calculerCheminsCourts();
 
 		// Initialisation des trajets
-		long sommeLongueurs = 0;
 		for (Voyageur v : voyageurs)
 		{
 			v.initialiserTrajet();
-			sommeLongueurs += v.getLongueurTrajet();
 		}
 		int nbArrives = 0;
 		long sommeTemps = 0;
@@ -205,8 +276,18 @@ public class Reseau {
 
 		// Tout le monde est arrivé, calcul de la moyenne des temps de parcours
 		double moyenne = (float) sommeTemps / nbArrives;
-		System.out.println(sommeLongueurs / nbArrives);
 		return moyenne;
+	}
+
+
+	@Override
+	protected Reseau clone() throws CloneNotSupportedException {
+		Reseau r = (Reseau) super.clone();
+		r.stations = new ArrayList<Station>(this.stations);
+		r.arcs = new ArrayList<Arc>(this.arcs);
+		r.voyageurs = new ArrayList<Voyageur>(this.voyageurs);
+		r.lignes = new ArrayList<Ligne>(this.lignes);
+		return r;
 	}
 
 
@@ -284,12 +365,17 @@ public class Reseau {
 		private void maj_distances(Station s1, Station s2, Arc a)
 		{
 			int longueurA = (int) Math.round(a.getLongueur());
+
 			// Si passer par ce nouvel arc fait changer de ligne, malus
-			Arc arcPrecedent = getArc(predecesseurs.get(s1), s1);
-			if (!s1.equals(depart) && !a.getLigne().equals(arcPrecedent.getLigne()))
+			if (a.getLigne() != null)
 			{
-				longueurA += Reseau.TEMPS_CORRESPONDANCE;
+				Arc arcPrecedent = getArc(predecesseurs.get(s1), s1);
+				if (!s1.equals(depart) && !a.getLigne().equals(arcPrecedent.getLigne()))
+				{
+					longueurA += Reseau.TEMPS_CORRESPONDANCE;
+				}
 			}
+
 			if (distances.get(s2) > distances.get(s1) + longueurA)
 			{
 				distances.put(s2, distances.get(s1) + longueurA);

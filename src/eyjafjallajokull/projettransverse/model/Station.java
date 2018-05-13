@@ -55,6 +55,14 @@ public class Station {
 	public void setCheminsCourts(Map<Station, List<Arc>> chemins) {
 		this.cheminsCourts = chemins;
 	}
+	
+	/**
+	 * Supprime les chemins les plus courts enregistrés.
+	 */
+	public void viderCheminCourts()
+	{
+		this.cheminsCourts = null;
+	}
 
 	/**
 	 * Retourne la distance entre cette station et la station donnée.

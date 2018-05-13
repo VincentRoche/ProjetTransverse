@@ -33,7 +33,7 @@ public class PanelReseau extends JPanel {
 		// Affichage de chaque arc
 		for (Arc a : reseau.getArcs())
 		{
-			Color Stationcolor = a.getLigne().getCouleur();
+			Color Stationcolor = a.getLigne() != null ? a.getLigne().getCouleur() : new Color(0);
 			g.setColor(Stationcolor) ;
 			int xb = a.getExtremite1().getCoordonneeX();
 			int yb = a.getExtremite1().getCoordonneeY();

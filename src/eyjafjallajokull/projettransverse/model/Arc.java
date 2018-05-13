@@ -14,6 +14,7 @@ public class Arc {
 	/** Utilisé pour la simulation des déplacements : nombre de voyageurs entrés sur l'arc par l'extrémité 2 dans l'unité de temps actuelle. */
 	private int entreesExtrem2;
 	/** Utilisé pour la simulation des déplacements : nombre maximal de voyageurs pouvant entrer dans une extrémité de l'arc en une unité de temps. */
+	private int flux;
 	private final static int DEBIT_ENTREE_MAX = 1; 
 	
 	Arc(Station extremite1, Station extremite2, Ligne ligne) {
@@ -92,6 +93,43 @@ public class Arc {
 	 */
 	public int getDebitEntreeMax() {
 		return DEBIT_ENTREE_MAX;
+	}
+
+	/**
+	 * @return Nombre de voyageurs passant par l'arc (calculé en même temps que les plus courts chemins)
+	 */
+	public int getFlux() {
+		return flux;
+	}
+	
+	/**
+	 * Ajoute un voyageur au flux de l'arc.
+	 */
+	public void incrementerFlux()
+	{
+		flux++;
+	}
+	
+	/**
+	 * Remet le flux de l'arc à 0.
+	 */
+	public void reinitialiserFlux()
+	{
+		flux = 0;
+	}
+	
+	/**
+	 * Retourne l'extrémité qui n'est pas la station donnée.
+	 * @param s Une des extrémités de l'arc.
+	 * @return L'autre extrémité, ou null si la station donnée n'appartient pas à l'arc.
+	 */
+	public Station getAutreExtremite(Station s)
+	{
+		if (s.equals(extremite1))
+			return extremite2;
+		else if (s.equals(extremite2))
+			return extremite1;
+		return null;
 	}
 
 	@Override

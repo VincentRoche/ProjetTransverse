@@ -1,34 +1,21 @@
 package eyjafjallajokull.projettransverse.test;
 
-import java.util.List;
-import java.util.Random;
-
-import eyjafjallajokull.projettransverse.model.Arc;
-import eyjafjallajokull.projettransverse.model.Ligne;
-import eyjafjallajokull.projettransverse.model.Reseau;
-import eyjafjallajokull.projettransverse.model.Station;
-import eyjafjallajokull.projettransverse.model.Voyageur;
-import eyjafjallajokull.projettransverse.view.FenetrePlan;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Test {
+import eyjafjallajokull.projettransverse.model.Arc;
+import eyjafjallajokull.projettransverse.model.IARoche;
+import eyjafjallajokull.projettransverse.model.Reseau;
+import eyjafjallajokull.projettransverse.view.FenetrePlan;
 
-	public static Station recherche(Reseau reseau, String nom){
-		for (Station s : reseau.getStations()){
-			if (s.getNom().equals(nom)){
-				return s;
-			}
-		}
-		return null;        
-	}
+public class Test {
 
 	public static void main(String[] args) {
 		int tailleMax = 500;
 		Reseau reseau = new Reseau(tailleMax, tailleMax);
 
-		//Lecture fichier Station
+		// Lecture fichier Station
 		String pathFichier="station.txt";
 
 		BufferedReader fluxEntree=null;
@@ -58,7 +45,7 @@ public class Test {
 				e.printStackTrace();
 			}
 		}
-		//Lecture fichier trajet
+		// Lecture fichier trajet
 		pathFichier="trajet.txt";
 
 		/*BufferedReader */fluxEntree=null;
@@ -73,7 +60,7 @@ public class Test {
 
 				for (int i=0; i < Integer.parseInt(trajet[2]); i++)
 				{
-					reseau.ajouterVoyageur(recherche(reseau, trajet[0]), recherche(reseau, trajet[1]));
+					reseau.ajouterVoyageur(reseau.getStation(trajet[0]), reseau.getStation(trajet[1]));
 				}                  
 			}
 		}
@@ -92,59 +79,28 @@ public class Test {
 			}
 		}
 
-		// Stations aléatoires
-		int nbStations = 10;
-		Random rand = new Random();
-		/*for (int i=0; i < nbStations; i++)
-		{
-			reseau.ajouterStation(rand.nextInt(tailleMax), rand.nextInt(tailleMax), "villejuif");
-		}*/
-		List<Station> stations = reseau.getStations();
-
-		// Ligne qui relie tout
-		Ligne l = reseau.ajouterLigne();
-		for (int i=1; i < stations.size(); i++)
-		{
-			reseau.ajouterArc(stations.get(i), stations.get(i - 1), l);
-		}
+		// Fenêtre
+		FenetrePlan f = new FenetrePlan(reseau);
 		
-		// Ligne entre 4 stations
-		Ligne l2 = reseau.ajouterLigne();
-		reseau.ajouterArc(stations.get(0), stations.get(2), l2);
-		reseau.ajouterArc(stations.get(2), stations.get(8), l2);
-		reseau.ajouterArc(stations.get(8), stations.get(6), l2);
-		
-		// Ligne entre 2 stations
-		Ligne l3 = reseau.ajouterLigne();
-		reseau.ajouterArc(stations.get(0), stations.get(7), l3);
+		// Placement des lignes avec l'IA
+		reseau = new IARoche(reseau, 3, 10000, f).placerLignes();
+		f.majReseau();
 
-		// Voyageurs aléatoires
-		/*for (Station s : stations)
-		{
-			// Nombre aléatoire
-			for (int i=0; i < rand.nextInt(10); i++)
-			{
-				reseau.ajouterVoyageur(s, stations.get(rand.nextInt(stations.size())));
-			}
-		}*/
-
-		// Affichage
-		for (Station s : stations)
+		// Affichage des données
+		/*for (Station s : reseau.getStations())
 		{
 			System.out.println(s);
-		}
+		}*/
 		for (Arc a : reseau.getArcs())
 		{
 			System.out.println(a);
 		}
-		for (Voyageur v : reseau.getVoyageurs())
+		/*for (Voyageur v : reseau.getVoyageurs())
 		{
 			System.out.println(v);
-		}
+		}*/
 
-		// Fenêtre
-		FenetrePlan f = new FenetrePlan(reseau);
-		
+
 		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
 	}
 
