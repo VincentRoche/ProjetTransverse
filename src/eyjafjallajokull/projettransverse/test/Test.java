@@ -51,7 +51,7 @@ public class Test {
 			}
 		}
 		
-		reseau.setxMax(xMax);
+		reseau.setxMax(xMax + 200);
 		reseau.setyMax(yMax);
 		
 		// Lecture fichier trajet
@@ -92,7 +92,7 @@ public class Test {
 		// Placement des lignes avec l'IA
 		reseau = new IARoche(reseau, 3, 10000, null).placerLignes();*/
 		// Fenêtre
-		FenetrePlan f = new FenetrePlan(reseau);
+		FenetrePlan f = new FenetrePlan(reseau, 0.6);
 		f.majReseau();
 
 		// Affichage des données

@@ -18,13 +18,15 @@ public class PanelReseau extends JPanel {
 
 	//Attributs
 	private final Reseau reseau;
+	private final double multiplicateur;
 
 	private static final int TAILLE_ROND = 15;
 	private static final int EPAISSEUR_TRAIT = 3;
 
 	//Constructeurs
-	public PanelReseau(Reseau reseau) {
+	public PanelReseau(Reseau reseau, double multiplicateur) {
 		this.reseau = reseau;
+		this.multiplicateur = multiplicateur;
 	}
 
 	public void paintComponent(Graphics g) {
@@ -35,12 +37,12 @@ public class PanelReseau extends JPanel {
 		{
 			Color Stationcolor = a.getLigne() != null ? a.getLigne().getCouleur() : new Color(0);
 			g.setColor(Stationcolor) ;
-			int xb = a.getExtremite1().getCoordonneeX();
-			int yb = a.getExtremite1().getCoordonneeY();
-			int xf = a.getExtremite2().getCoordonneeX();
-			int yf = a.getExtremite2().getCoordonneeY();
+			int xb = (int) (a.getExtremite1().getCoordonneeX() * multiplicateur);
+			int yb = (int) (a.getExtremite1().getCoordonneeY() * multiplicateur);
+			int xf = (int) (a.getExtremite2().getCoordonneeX() * multiplicateur);
+			int yf = (int) (a.getExtremite2().getCoordonneeY() * multiplicateur);
 			Graphics2D g2 = (Graphics2D) g;
-			g2.setStroke(new BasicStroke(EPAISSEUR_TRAIT));
+			g2.setStroke(new BasicStroke((float) (EPAISSEUR_TRAIT * multiplicateur)));
 			g2.setColor(Stationcolor);
 			g2.drawLine(xb, yb, xf, yf);
 
@@ -50,13 +52,13 @@ public class PanelReseau extends JPanel {
 		{
 			Color Stationcolor = new Color(0, 0, 0);
 			g.setColor(Stationcolor) ;
-			int xb = s.getCoordonneeX() - TAILLE_ROND / 2;
-			int yb = s.getCoordonneeY() - TAILLE_ROND / 2;
-			g.fillOval(xb, yb, TAILLE_ROND, TAILLE_ROND);
-			g.drawString(s.getNom(), xb + TAILLE_ROND, yb);
+			int xb = (int) ((s.getCoordonneeX() - TAILLE_ROND / 2) * multiplicateur);
+			int yb = (int) ((s.getCoordonneeY() - TAILLE_ROND / 2) * multiplicateur);
+			g.fillOval(xb, yb, (int) (TAILLE_ROND * multiplicateur), (int) (TAILLE_ROND * multiplicateur));
+			g.drawString(s.getNom(), (int) (xb + TAILLE_ROND * multiplicateur), yb);
 			g.setColor(Color.WHITE);
-			int ecart = TAILLE_ROND / 6;
-			g.fillOval(xb + ecart, yb + ecart, TAILLE_ROND - ecart * 2, TAILLE_ROND - ecart * 2);
+			int ecart = (int) ((TAILLE_ROND / 6) * multiplicateur);
+			g.fillOval(xb + ecart, yb + ecart, (int) ((TAILLE_ROND - ecart * 2) * multiplicateur), (int) ((TAILLE_ROND - ecart * 2) * multiplicateur));
 		}
 	}
 }
