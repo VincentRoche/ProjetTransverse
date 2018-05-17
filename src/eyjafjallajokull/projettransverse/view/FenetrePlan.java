@@ -19,7 +19,7 @@ public class FenetrePlan extends JFrame {
         setTitle("Ligne de métro"); 
         setSize(reseau.getxMax(), reseau.getyMax()); 
         setLocationRelativeTo(null); 
-        setResizable(false); 
+        setResizable(true); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         majReseau();
         setVisible(true);

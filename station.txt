@@ -3,7 +3,7 @@ vitry 120 70
 ivry 84 140
 paris 250 148
 aaa 300 200
-bbb 400 180
+bbb 400 100
 ccc 200 300
 ddd 400 400
 eee 200 400

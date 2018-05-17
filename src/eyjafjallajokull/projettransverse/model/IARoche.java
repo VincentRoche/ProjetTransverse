@@ -69,6 +69,8 @@ public class IARoche extends IACreationLignes {
 							r.ajouterArc(s1, s2, null);
 						} catch (TropDArcsDeLaMemeLigneException e) {
 							e.printStackTrace();
+						} catch (ArcDejaExistantException e) {
+							// Rien
 						}
 					}
 				}
@@ -100,8 +102,9 @@ public class IARoche extends IACreationLignes {
 			try {
 				reseau.ajouterArc(premierArc.getExtremite1(), premierArc.getExtremite2(), ligne);
 				//fenetre.majReseau();
-			} catch (TropDArcsDeLaMemeLigneException e) {
+			} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
 				e.printStackTrace();
+				break;
 			}
 
 			// Ajout d'arcs à chaque bout du premier arc
@@ -149,7 +152,7 @@ public class IARoche extends IACreationLignes {
 							//fenetre.majReseau();
 							arcFluxMax = nouvelArcMax;
 							extremite = nouvelArcMax.getAutreExtremite(extremite);
-						} catch (TropDArcsDeLaMemeLigneException e) {
+						} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
 							stop = true;
 						}
 					}

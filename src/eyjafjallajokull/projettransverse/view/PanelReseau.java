@@ -19,8 +19,8 @@ public class PanelReseau extends JPanel {
 	//Attributs
 	private final Reseau reseau;
 
-	private static final int TAILLE_ROND = 25;
-	private static final int EPAISSEUR_TRAIT = 5;
+	private static final int TAILLE_ROND = 15;
+	private static final int EPAISSEUR_TRAIT = 3;
 
 	//Constructeurs
 	public PanelReseau(Reseau reseau) {

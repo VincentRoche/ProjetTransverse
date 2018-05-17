@@ -19,13 +19,9 @@ public class Reseau implements Cloneable {
 	/** Temps ajouté par un changement de ligne dans un trajet. */
 	public final static int TEMPS_CORRESPONDANCE = 100;
 
-	/**
-	 * @param xMax Taille maximale en X (le plus loin où une station peut être placée)
-	 * @param yMax Taille maximale en Y
-	 */
-	public Reseau(int xMax, int yMax) {
-		this.xMax = xMax;
-		this.yMax = yMax;
+	public Reseau() {
+		this.xMax = 600;
+		this.yMax = 500;
 		this.stations = new ArrayList<Station>();
 		this.arcs = new ArrayList<Arc>();
 		this.voyageurs = new ArrayList<Voyageur>();
@@ -38,8 +34,9 @@ public class Reseau implements Cloneable {
 	 * @param extremite2 Station à l'autre bout de l'arc.
 	 * @param ligne Ligne correspondante à l'arc (peut être null dans certains algorithmes spécifiques).
 	 * @throws TropDArcsDeLaMemeLigneException Si une des extrémités est déjà liée à 2 arcs de la ligne donnée.
+	 * @throws ArcDejaExistantException S'il y a déjà un arc entre ces sommets.
 	 */
-	public void ajouterArc(Station extremite1, Station extremite2, Ligne ligne) throws TropDArcsDeLaMemeLigneException
+	public void ajouterArc(Station extremite1, Station extremite2, Ligne ligne) throws TropDArcsDeLaMemeLigneException, ArcDejaExistantException
 	{
 		if (ligne != null)
 		{
@@ -63,6 +60,10 @@ public class Reseau implements Cloneable {
 		if (!arcs.contains(a))
 		{
 			arcs.add(a);
+		}
+		else
+		{
+			throw new ArcDejaExistantException(a.toString());
 		}
 	}
 
@@ -194,6 +195,20 @@ public class Reseau implements Cloneable {
 		return yMax;
 	}
 	
+	/**
+	 * @param xMax Coordonnée X maximale du plan.
+	 */
+	public void setxMax(int xMax) {
+		this.xMax = xMax;
+	}
+
+	/**
+	 * @param yMax Coordonnée Y maximale du plan.
+	 */
+	public void setyMax(int yMax) {
+		this.yMax = yMax;
+	}
+
 	/**
 	 * @return Longueur totale du réseau (tous les arcs).
 	 */

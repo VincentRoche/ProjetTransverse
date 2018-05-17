@@ -5,18 +5,19 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import eyjafjallajokull.projettransverse.model.Arc;
-import eyjafjallajokull.projettransverse.model.IARoche;
 import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
 
 public class Test {
 
 	public static void main(String[] args) {
-		int tailleMax = 500;
-		Reseau reseau = new Reseau(tailleMax, tailleMax);
+		Reseau reseau = new Reseau();
 
 		// Lecture fichier Station
-		String pathFichier = "station.txt";
+		//String pathFichier = "station.txt";
+		String pathFichier = "StationsParis.txt";
+		int xMax = 0;
+		int yMax = 0;
 
 		BufferedReader fluxEntree=null;
 		try {
@@ -27,8 +28,12 @@ public class Test {
 
 			while((ligneLue = fluxEntree.readLine())!=null){
 				station = ligneLue.split(" ");
-
-				reseau.ajouterStation(Integer.parseInt(station[1]), Integer.parseInt(station[2]), station[0]);                         
+				
+				int x = Integer.parseInt(station[1]);
+				int y = Integer.parseInt(station[2]);
+				reseau.ajouterStation(x, y, station[0]);    
+				xMax = Math.max(x, xMax); 
+				yMax = Math.max(y, yMax);
 			}
 		}
 		catch(IOException exc) {
@@ -45,10 +50,14 @@ public class Test {
 				e.printStackTrace();
 			}
 		}
+		
+		reseau.setxMax(xMax);
+		reseau.setyMax(yMax);
+		
 		// Lecture fichier trajet
-		pathFichier="trajet.txt";
+		/*pathFichier="trajet.txt";
 
-		/*BufferedReader */fluxEntree=null;
+		fluxEntree=null;
 		try {
 			fluxEntree = new BufferedReader(new FileReader(pathFichier));
 
@@ -70,7 +79,7 @@ public class Test {
 		finally{
 			try{
 				if(fluxEntree!=null){
-					/* Fermeture du flux vers le fichier */
+					// Fermeture du flux vers le fichier
 					fluxEntree.close();
 				}
 			}
@@ -81,7 +90,7 @@ public class Test {
 
 		
 		// Placement des lignes avec l'IA
-		reseau = new IARoche(reseau, 3, 10000, null).placerLignes();
+		reseau = new IARoche(reseau, 3, 10000, null).placerLignes();*/
 		// Fenêtre
 		FenetrePlan f = new FenetrePlan(reseau);
 		f.majReseau();
@@ -101,7 +110,7 @@ public class Test {
 		}*/
 
 
-		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
+		//System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
 	}
 
 }
