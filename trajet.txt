@@ -6,3 +6,4 @@ ccc villejuif 30
 eee bbb 4
 bbb ivry 8
 ddd fff 2
+paris fff 50

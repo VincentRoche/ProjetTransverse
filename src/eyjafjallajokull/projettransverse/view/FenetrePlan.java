@@ -21,14 +21,14 @@ public class FenetrePlan extends JFrame {
         setLocationRelativeTo(null); 
         setResizable(false); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
         majReseau();
+        setVisible(true);
   }
 
 	/**
 	 * Met à jour le plan affiché
 	 */
 	public void majReseau() {
-        setContentPane(new PanelReseau(reseau));
+        add(new PanelReseau(reseau));
 	}
 }

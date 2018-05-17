@@ -16,7 +16,7 @@ public class Test {
 		Reseau reseau = new Reseau(tailleMax, tailleMax);
 
 		// Lecture fichier Station
-		String pathFichier="station.txt";
+		String pathFichier = "station.txt";
 
 		BufferedReader fluxEntree=null;
 		try {
@@ -79,11 +79,11 @@ public class Test {
 			}
 		}
 
-		// Fenêtre
-		FenetrePlan f = new FenetrePlan(reseau);
 		
 		// Placement des lignes avec l'IA
-		reseau = new IARoche(reseau, 3, 10000, f).placerLignes();
+		reseau = new IARoche(reseau, 3, 10000, null).placerLignes();
+		// Fenêtre
+		FenetrePlan f = new FenetrePlan(reseau);
 		f.majReseau();
 
 		// Affichage des données
