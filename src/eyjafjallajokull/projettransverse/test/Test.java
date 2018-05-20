@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import eyjafjallajokull.projettransverse.model.Arc;
+import eyjafjallajokull.projettransverse.model.IARoche;
 import eyjafjallajokull.projettransverse.model.Reseau;
+import eyjafjallajokull.projettransverse.model.Station;
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
 
 public class Test {
@@ -28,11 +29,11 @@ public class Test {
 
 			while((ligneLue = fluxEntree.readLine())!=null){
 				station = ligneLue.split(" ");
-				
+
 				int x = Integer.parseInt(station[1]);
 				int y = Integer.parseInt(station[2]);
 				reseau.ajouterStation(x, y, station[0]);    
-				xMax = Math.max(x, xMax); 
+				xMax = Math.max(x, xMax);
 				yMax = Math.max(y, yMax);
 			}
 		}
@@ -50,12 +51,13 @@ public class Test {
 				e.printStackTrace();
 			}
 		}
-		
+
 		reseau.setxMax(xMax + 200);
-		reseau.setyMax(yMax);
-		
+		reseau.setyMax(yMax + 100);
+
 		// Lecture fichier trajet
-		/*pathFichier="trajet.txt";
+		//pathFichier="trajet.txt";
+		pathFichier="TrajetsParis.txt";
 
 		fluxEntree=null;
 		try {
@@ -67,10 +69,20 @@ public class Test {
 			while((ligneLue = fluxEntree.readLine())!=null) {
 				trajet = ligneLue.split(" ");
 
-				for (int i=0; i < Integer.parseInt(trajet[2]); i++)
+				Station s1 = reseau.getStation(trajet[0]);
+				Station s2 = reseau.getStation(trajet[1]);
+
+				if (s1 == null)
+					System.out.println("Erreur : la station " + trajet[0] + " n'est pas définie.");
+				else if (s2 == null)
+					System.out.println("Erreur : la station " + trajet[1] + " n'est pas définie.");
+				else
 				{
-					reseau.ajouterVoyageur(reseau.getStation(trajet[0]), reseau.getStation(trajet[1]));
-				}                  
+					for (int i=0; i < Integer.parseInt(trajet[2]); i++)
+					{
+						reseau.ajouterVoyageur(s1, s2);
+					}               
+				}
 			}
 		}
 		catch(IOException exc){
@@ -88,29 +100,29 @@ public class Test {
 			}
 		}
 
-		
+
 		// Placement des lignes avec l'IA
-		reseau = new IARoche(reseau, 3, 10000, null).placerLignes();*/
-		// Fenêtre
 		FenetrePlan f = new FenetrePlan(reseau, 0.6);
-		f.majReseau();
+		reseau = new IARoche(reseau, 16, 100000, f).placerLignes();
+		// Fenêtre
+		f.majReseau(null);
 
 		// Affichage des données
 		/*for (Station s : reseau.getStations())
 		{
 			System.out.println(s);
-		}*/
+		}
 		for (Arc a : reseau.getArcs())
 		{
 			System.out.println(a);
 		}
-		/*for (Voyageur v : reseau.getVoyageurs())
+		for (Voyageur v : reseau.getVoyageurs())
 		{
 			System.out.println(v);
 		}*/
 
 
-		//System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
+		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
 	}
 
 }

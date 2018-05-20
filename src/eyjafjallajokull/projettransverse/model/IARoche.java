@@ -1,13 +1,32 @@
 package eyjafjallajokull.projettransverse.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
 
 public class IARoche extends IACreationLignes {
 
 	/**
-	 * Les virages formant un angle inférieur à celui-ci seront interdits.
+	 * Les virages formant un angle inférieur à celui-ci seront interdits sur une ligne.
 	 */
-	public final int ANGLE_MIN = 90;
+	public final int ANGLE_MIN_LIGNE = 30;
+	/**
+	 * Il ne peut y avoir aucun angle inférieur à celui-là, même si les lignes sont différentes.
+	 */
+	public final int ANGLE_MAX = 20;
+	/**
+	 * Importance du flux dans le choix d'un arc pour prolonger une ligne.
+	 */
+	private static final double IMPORTANCE_FLUX = 1;
+	/**
+	 * Importance de l'angle avec le dernier arc dans le choix d'un arc pour prolonger une ligne.
+	 */
+	private static final double IMPORTANCE_ANGLE = 1;
+	/**
+	 * Importance du nombre de correspondances dans le choix d'un arc pour prolonger une ligne.
+	 */
+	private static final double IMPORTANCE_CORRESPONDANCES = 0.5;
 
 	public IARoche(Reseau reseau, int nbLignes, int longueurMax, FenetrePlan fenetre) {
 		super(reseau, nbLignes, longueurMax, fenetre);
@@ -26,35 +45,67 @@ public class IARoche extends IACreationLignes {
 			return null;
 		}
 
-		for (Station s1 : r.getStations())
+		List<Station> stations = r.getStations();
+		for (int i=0; i < stations.size(); i++)
 		{
+			Station s1 = stations.get(i);
+			List<Arc> voisinsS1 = r.getArcsVoisins(s1);
+
 			// Tentative d'ajout d'un arc entre s1 et toutes les autres stations
-			for (Station s2 : r.getStations())
+			for (int j = i + 1; j < stations.size(); j++)
 			{
+				Station s2 = stations.get(j);
+
 				if (!s1.equals(s2))
 				{
-					int x0 = s1.getCoordonneeX();
-					int y0 = s1.getCoordonneeY();
-					int x1 = s2.getCoordonneeX();
-					int y1 = s2.getCoordonneeY();
-					double longueur = s1.distance(s2);
-					// Recherche dans les arcs déjà ajoutés d'arcs qui croisent celui qu'on veut ajouter
-					boolean ajouterArc = true;
-					for (Arc a : r.getArcs())
-					{
-						if (!a.getExtremite1().equals(s1) && !a.getExtremite1().equals(s2) && !a.getExtremite2().equals(s1) && !a.getExtremite2().equals(s2))
-						{
-							int x2 = a.getExtremite1().getCoordonneeX();
-							int y2 = a.getExtremite1().getCoordonneeY();
-							int x3 = a.getExtremite2().getCoordonneeX();
-							int y3 = a.getExtremite2().getCoordonneeY();
+					List<Arc> voisinsS2 = r.getArcsVoisins(s2);
 
+					double longueur = s1.distance(s2);
+					if (longueur < longueurMax / r.getStations().size())
+					{
+						// Recherche dans les arcs déjà ajoutés d'arcs qui croisent celui qu'on veut ajouter ou dont l'angle est trop faible
+						boolean ajouterArc = true;
+						List<Arc> arcsASupprimer = new ArrayList<Arc>();
+						for (Arc a : r.getArcs())
+						{
 							// Si ça se croise
-							if (((x2-x0)*(y1-y0) - (y2-y0)*(x1-x0)) * ((x3-x0)*(y1-y0) - (y3-y0)*(x1-x0)) < 0 && ((x0-x2)*(y3-y2) - (y0-y2)*(x3-x2)) * ((x1-x2)*(y3-y2) - (y1-y2)*(x3-x2)) < 0)
+							if (!a.getExtremite1().equals(s1) && !a.getExtremite1().equals(s2) && !a.getExtremite2().equals(s1) && !a.getExtremite2().equals(s2))
+							{
+								if (new Arc(s1, s2, null).croise(a))
+								{
+									// On abandonne le plus long
+									if (a.getLongueur() >= longueur)
+									{
+										arcsASupprimer.add(a);
+									}
+									else // Si celui qu'on veut ajouter est plus long, bah on ne l'ajoute pas...
+									{
+										ajouterArc = false;
+										break;
+									}
+								}
+							}
+
+							// Recherche de si les arcs se touchent et calcul de l'angle entre eux
+							double angle = 0;
+							boolean voisin = false;
+							if (voisinsS1.contains(a))
+							{
+								voisin = true;
+								angle = calculerAngle(s2, s1, a.getAutreExtremite(s1));
+							}
+							else if (voisinsS2.contains(a))
+							{
+								voisin = true;
+								angle = calculerAngle(s1, s2, a.getAutreExtremite(s2));
+							}
+							if (voisin && (Math.abs(angle) < ANGLE_MAX/* || Math.abs(angle) > 360 - ANGLE_MAX*/))
 							{
 								// On abandonne le plus long
 								if (a.getLongueur() >= longueur)
-									r.supprimerArc(a);
+								{
+									arcsASupprimer.add(a);
+								}
 								else // Si celui qu'on veut ajouter est plus long, bah on ne l'ajoute pas...
 								{
 									ajouterArc = false;
@@ -62,21 +113,28 @@ public class IARoche extends IACreationLignes {
 								}
 							}
 						}
-					}
-					if (ajouterArc)
-					{
-						try {
-							r.ajouterArc(s1, s2, null);
-						} catch (TropDArcsDeLaMemeLigneException e) {
-							e.printStackTrace();
-						} catch (ArcDejaExistantException e) {
-							// Rien
+						if (ajouterArc)
+						{
+							// Suppression des arcs qu'il croise
+							for (Arc a : arcsASupprimer)
+							{
+								r.supprimerArc(a);
+							}
+
+							// Ajout du nouvel arc
+							try {
+								r.ajouterArc(s1, s2, null);
+							} catch (TropDArcsDeLaMemeLigneException e) {
+								e.printStackTrace();
+							} catch (ArcDejaExistantException e) {
+								// Rien
+							}
 						}
 					}
 				}
 			}
+			fenetre.majReseau(r);
 		}
-
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Etape 2 : Calcul des chemins les plus courts et du flux de chaque arc (nombre de voyageurs qui l'empruntent).
@@ -87,6 +145,8 @@ public class IARoche extends IACreationLignes {
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Etape 3 : Placement des lignes sur les arcs aux flux les plus élevés, sans faire de virages absurdes
 
+		// Valeurs utiles aux calculs
+		
 		// Pour chaque ligne
 		for (int i = 0; i < nbLignes; i++)
 		{
@@ -117,30 +177,39 @@ public class IARoche extends IACreationLignes {
 				while (!stop) // Jusqu'à ce qu'on ne puisse plus continuer la ligne
 				{
 					Arc nouvelArcMax = null;
+					double scoreMax = 0;
 					Station autreExtremite = arcFluxMax.getAutreExtremite(extremite);
+					
+					// Calcul des valeurs maximale parmi les angles voisins
+					int fluxMax = 0;
+					int nbVoisinsMax = 0;
+					for (Arc arcVoisin : r.getArcsVoisins(extremite))
+					{
+						if (!arcVoisin.equals(arcFluxMax) && !reseau.getArcs().contains(arcVoisin)) // On ne veut pas remplacer un arc existant
+						{
+							fluxMax = Math.max(fluxMax, arcVoisin.getFlux());
+							nbVoisinsMax = Math.max(nbVoisinsMax, reseau.getArcsVoisins(arcVoisin.getAutreExtremite(extremite)).size());
+						}
+					}
 					// Sélection de l'arc voisin au plus grand flux et d'angle supérieur à ANGLE_MIN
 					for (Arc arcVoisin : r.getArcsVoisins(extremite))
 					{
 						if (!arcVoisin.equals(arcFluxMax) && !reseau.getArcs().contains(arcVoisin)) // On ne veut pas remplacer un arc existant
 						{
 							Station extremiteVoisin = arcVoisin.getAutreExtremite(extremite);
-							// Calcul de l'angle
-							int xExtremite = extremite.getCoordonneeX();
-							int yExtremite = extremite.getCoordonneeY();
-							int xAutreExtremite = autreExtremite.getCoordonneeX();
-							int yAutreExtremite = autreExtremite.getCoordonneeY();
-							int xVoisin = extremiteVoisin.getCoordonneeX();
-							int yVoisin = extremiteVoisin.getCoordonneeY();
-							double angle1 = Math.atan2(yAutreExtremite - yExtremite, xAutreExtremite - xExtremite);
-							double angle2 = Math.atan2(yVoisin - yExtremite, xVoisin - xExtremite);
-							double angle = Math.abs(Math.toDegrees(angle1 - angle2));
 
-							if (angle >= ANGLE_MIN && angle <= 360 - ANGLE_MIN)
+							double angle = calculerAngle(autreExtremite, extremite, extremiteVoisin);
+							double scoreAngle = (angle - ANGLE_MIN_LIGNE) / ANGLE_MIN_LIGNE;
+
+							double scoreFlux = (double) arcVoisin.getFlux() / fluxMax;
+
+							double scoreNbVoisins = (nbVoisinsMax == 0) ? 1 : 1 - (double) reseau.getArcsVoisins(extremiteVoisin).size() / nbVoisinsMax;
+							
+							double scoreArc = IMPORTANCE_FLUX * scoreFlux + IMPORTANCE_ANGLE * scoreAngle + IMPORTANCE_CORRESPONDANCES * scoreNbVoisins;
+							if (angle >= ANGLE_MIN_LIGNE && (nouvelArcMax == null || scoreMax < scoreArc))
 							{
-								if (nouvelArcMax == null || nouvelArcMax.getFlux() < arcVoisin.getFlux())
-								{
-									nouvelArcMax = arcVoisin;
-								}
+								nouvelArcMax = arcVoisin;
+								scoreMax = scoreArc;
 							}
 						}
 					}
@@ -149,7 +218,7 @@ public class IARoche extends IACreationLignes {
 					{
 						try {
 							reseau.ajouterArc(nouvelArcMax.getExtremite1(), nouvelArcMax.getExtremite2(), ligne);
-							//fenetre.majReseau();
+							fenetre.majReseau(reseau);
 							arcFluxMax = nouvelArcMax;
 							extremite = nouvelArcMax.getAutreExtremite(extremite);
 						} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
@@ -166,6 +235,29 @@ public class IARoche extends IACreationLignes {
 
 
 		return reseau;
+	}
+
+	/**
+	 * Calcule l'angle entre deux arcs ayant le sommet milieu en commun.
+	 * @param s1 Sommet 1
+	 * @param milieu Sommet en commun entre les deux arcs ("pointe" de l'angle)
+	 * @param s2 Sommet 2
+	 * @return Angle Valeur absolue de l'angle.
+	 */
+	private double calculerAngle(Station s1, Station milieu, Station s2)
+	{
+		int xMilieu = milieu.getCoordonneeX();
+		int yMilieu = milieu.getCoordonneeY();
+		int x1 = s1.getCoordonneeX();
+		int y1 = s1.getCoordonneeY();
+		int x2 = s2.getCoordonneeX();
+		int y2 = s2.getCoordonneeY();
+		double angle1 = Math.atan2(y1 - yMilieu, x1 - xMilieu);
+		double angle2 = Math.atan2(y2 - yMilieu, x2 - xMilieu);
+		double angle = Math.abs(Math.toDegrees(angle1 - angle2));
+		if (angle > 180)
+			angle = 360 - angle;
+		return angle;
 	}
 
 }

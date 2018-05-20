@@ -33,10 +33,11 @@ public class Reseau implements Cloneable {
 	 * @param extremite1 Station à un bout de l'arc.
 	 * @param extremite2 Station à l'autre bout de l'arc.
 	 * @param ligne Ligne correspondante à l'arc (peut être null dans certains algorithmes spécifiques).
+	 * @return L'arc ajouté
 	 * @throws TropDArcsDeLaMemeLigneException Si une des extrémités est déjà liée à 2 arcs de la ligne donnée.
 	 * @throws ArcDejaExistantException S'il y a déjà un arc entre ces sommets.
 	 */
-	public void ajouterArc(Station extremite1, Station extremite2, Ligne ligne) throws TropDArcsDeLaMemeLigneException, ArcDejaExistantException
+	public Arc ajouterArc(Station extremite1, Station extremite2, Ligne ligne) throws TropDArcsDeLaMemeLigneException, ArcDejaExistantException
 	{
 		if (ligne != null)
 		{
@@ -60,6 +61,7 @@ public class Reseau implements Cloneable {
 		if (!arcs.contains(a))
 		{
 			arcs.add(a);
+			return a;
 		}
 		else
 		{
@@ -115,7 +117,7 @@ public class Reseau implements Cloneable {
 	public Station getStation(String nom) {
 		for (Station s : stations)
 		{
-			if (s.getNom().equals(nom))
+			if (s.getNom().equalsIgnoreCase(nom))
 				return s;
 		}
 		return null;
@@ -315,7 +317,7 @@ public class Reseau implements Cloneable {
 		private Map<Station, Integer> distances;
 		private Map<Station, Station> predecesseurs;
 
-		Dijkstra(Station depart)
+		private Dijkstra(Station depart)
 		{
 			this.depart = depart;
 			this.distances = new HashMap<Station, Integer>();
@@ -329,7 +331,7 @@ public class Reseau implements Cloneable {
 			distances.put(depart, 0); // Sauf la station de départ qui est initialisée à 0
 		}
 
-		Map<Station, List<Arc>> calculerChemins()
+		private Map<Station, List<Arc>> calculerChemins()
 		{
 			List<Station> q = new ArrayList<Station>(stations); //Ensemble de tous les noeuds
 			while (!q.isEmpty())
