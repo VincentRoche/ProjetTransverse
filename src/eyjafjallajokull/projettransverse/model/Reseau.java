@@ -111,7 +111,7 @@ public class Reseau implements Cloneable {
 	public List<Station> getStations() {
 		return new ArrayList<Station>(stations);
 	}
-	
+
 	/**
 	 * @param nom Nom recherché
 	 * @return Station portant le nom cherché.
@@ -124,7 +124,7 @@ public class Reseau implements Cloneable {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @return Liste des stations reliées à aucune ligne
 	 */
@@ -138,7 +138,7 @@ public class Reseau implements Cloneable {
 		}
 		return liste;
 	}
-	
+
 	/**
 	 * @param station
 	 * @return Liste des arcs étant le dernier arc d'une ligne à la station donnée.
@@ -251,7 +251,7 @@ public class Reseau implements Cloneable {
 	public int getyMax() {
 		return yMax;
 	}
-	
+
 	/**
 	 * @param xMax Coordonnée X maximale du plan.
 	 */
@@ -277,7 +277,7 @@ public class Reseau implements Cloneable {
 		}
 		return l;
 	}
-	
+
 	public double longueurLigne(Ligne ligne) {
 		double l = 0;
 		for (Arc a : getArcs(ligne))
@@ -299,6 +299,15 @@ public class Reseau implements Cloneable {
 	 */
 	public void calculerCheminsCourts()
 	{
+		calculerCheminsCourts(new ArrayList<Station>());
+	}
+
+	/**
+	 * Calcule les chemins les plus courts pour chaque station et voyageur (les résultats sont dans chaque station), et le flux de chaque arc.
+	 * @param stationsIgnorees Stations pour lesquelles ne rien calculer (null pour tout faire).
+	 */
+	public void calculerCheminsCourts(List<Station> stationsIgnorees)
+	{
 		// Réinitialisation des chemins les plus courts
 		for (Station s : stations)
 		{
@@ -314,17 +323,20 @@ public class Reseau implements Cloneable {
 		// Dijkstra
 		for (Voyageur voyageur : voyageurs)
 		{
-			if (voyageur.getOrigine().getCheminCourt(voyageur.getDestination()) == null) // Si le trajet le plus court n'a pas encore été calculé
+			if (!stationsIgnorees.contains(voyageur.getOrigine()) && !stationsIgnorees.contains(voyageur.getDestination()))
 			{
-				new Dijkstra(voyageur.getOrigine()).calculerChemins();
-			}
-			// Incrémentation du flux de chaque arc du chemin
-			for (Arc a : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
-			{
-				a.incrementerFlux();
+				if (voyageur.getOrigine().getCheminCourt(voyageur.getDestination()) == null) // Si le trajet le plus court n'a pas encore été calculé
+				{
+					new Dijkstra(voyageur.getOrigine(), stationsIgnorees).calculerChemins();
+				}
+				// Incrémentation du flux de chaque arc du chemin
+				for (Arc a : voyageur.getOrigine().getCheminCourt(voyageur.getDestination()))
+				{
+					a.incrementerFlux();
+				}
 			}
 		}
-		
+
 		// Calcul du flux moyen par arc
 		long somme = 0;
 		for (Arc a : arcs)
@@ -339,16 +351,22 @@ public class Reseau implements Cloneable {
 	 * @return Moyenne des temps de parcours des voyageurs
 	 */
 	public double evaluer() {
-		calculerCheminsCourts();
+		List<Station> stationsIsolees = stationsIsolees(); // On veut les ignorer
+		calculerCheminsCourts(stationsIsolees);
 
 		// Initialisation des trajets
+		List<Voyageur> voyageursCalcules = new ArrayList<Voyageur>();
 		for (Voyageur v : voyageurs)
 		{
-			v.initialiserTrajet();
+			if (!stationsIsolees.contains(v.getOrigine()) && ! stationsIsolees.contains(v.getDestination()))
+			{
+				v.initialiserTrajet();
+				voyageursCalcules.add(v);
+			}
 		}
 		int nbArrives = 0;
 		long sommeTemps = 0;
-		while (nbArrives < voyageurs.size())
+		while (nbArrives < voyageursCalcules.size())
 		{
 			System.out.println(nbArrives);
 			// Remise des compteurs de voyageurs des arcs à 0
@@ -357,7 +375,7 @@ public class Reseau implements Cloneable {
 				a.reinitialiserEntrees();
 			}
 			// Déplacement des voyageurs pas encore arrivés
-			for (Voyageur v : voyageurs)
+			for (Voyageur v : voyageursCalcules)
 			{
 				if (!v.estArrive())
 				{
@@ -396,15 +414,18 @@ public class Reseau implements Cloneable {
 		private Station depart;
 		private Map<Station, Integer> distances;
 		private Map<Station, Station> predecesseurs;
+		private List<Station> stationsUtilisees;
 
-		private Dijkstra(Station depart)
+		private Dijkstra(Station depart, List<Station> stationsIgnorees)
 		{
 			this.depart = depart;
 			this.distances = new HashMap<Station, Integer>();
 			this.predecesseurs = new HashMap<Station, Station>();
+			this.stationsUtilisees = new ArrayList<Station>(stations);
+			stationsUtilisees.removeAll(stationsIgnorees);
 
 			// Initialisation des distances à l'infini
-			for (Station s : stations)
+			for (Station s : stationsUtilisees)
 			{
 				distances.put(s, Integer.MAX_VALUE);
 			}
@@ -413,7 +434,7 @@ public class Reseau implements Cloneable {
 
 		private Map<Station, List<Arc>> calculerChemins()
 		{
-			List<Station> q = new ArrayList<Station>(stations); //Ensemble de tous les noeuds
+			List<Station> q = new ArrayList<Station>(stationsUtilisees); //Ensemble de tous les noeuds
 			while (!q.isEmpty())
 			{
 				Station s1 = trouve_min(q);
@@ -427,7 +448,7 @@ public class Reseau implements Cloneable {
 
 			// Récupération des chemins les plus courts pour chaque station
 			Map<Station, List<Arc>> chemins = new HashMap<Station, List<Arc>>();
-			for (Station station : stations) // Pour chaque station de fin
+			for (Station station : stationsUtilisees) // Pour chaque station de fin
 			{
 				List<Arc> chemin = new ArrayList<Arc>();
 				Station s = station;

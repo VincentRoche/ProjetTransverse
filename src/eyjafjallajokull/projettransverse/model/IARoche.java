@@ -15,11 +15,11 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Les virages formant un angle inférieur à celui-ci seront préférables sur une ligne.
 	 */
-	public static final int ANGLE_MIN_IDEAL = 125;
+	public static final int ANGLE_MIN_IDEAL = 140;
 	/**
 	 * Les virages formant un angle inférieur à celui-ci seront interdits sur une ligne.
 	 */
-	public static final int ANGLE_MIN_REQUIS = 80;
+	public static final int ANGLE_MIN_REQUIS = 90;
 	/**
 	 * Il ne peut y avoir aucun angle inférieur à celui-là, même si les lignes sont différentes.
 	 */
@@ -27,19 +27,19 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Importance du flux dans le choix d'un arc pour prolonger une ligne.
 	 */
-	public static final double IMPORTANCE_FLUX = 1;
+	public static final double IMPORTANCE_FLUX = 1.5;
 	/**
 	 * Importance de l'angle avec le dernier arc dans le choix d'un arc pour prolonger une ligne.
 	 */
-	public static final double IMPORTANCE_ANGLE = 2.25;
+	public static final double IMPORTANCE_ANGLE = 3;
 	/**
 	 * Importance du nombre de correspondances dans le choix d'un arc pour prolonger une ligne.
 	 */
-	public static final double IMPORTANCE_CORRESPONDANCES = 1;
+	public static final double IMPORTANCE_CORRESPONDANCES = 0.75;
 	/**
 	 * Importance de la longueur dans le choix d'un arc pour prolonger une ligne.
 	 */
-	private static final double IMPORTANCE_LONGUEUR = 1;
+	private static final double IMPORTANCE_LONGUEUR = 0.5;
 
 	public IARoche(Reseau reseau, int nbLignes, int longueurMax, FenetrePlan fenetre) {
 		super(reseau, nbLignes, longueurMax, fenetre);
@@ -185,7 +185,7 @@ public class IARoche extends IACreationLignes {
 		for (Arc a : reseauComplet.getArcs())
 		{
 			if ((premierArc == null || premierArc.getFlux() < a.getFlux()) && !reseau.getArcs().contains(a)
-					&& (reseau.getArcsVoisins(a.getExtremite1()).isEmpty() || reseau.getArcsVoisins(a.getExtremite2()).isEmpty()))
+					&& (reseau.getArcsVoisins(a.getExtremite1()).isEmpty() && reseau.getArcsVoisins(a.getExtremite2()).isEmpty()))
 				premierArc = a;
 		}
 
@@ -205,6 +205,7 @@ public class IARoche extends IACreationLignes {
 
 	private void continuerLigne(Ligne ligne, Station extremite, Arc arcPreced) {
 		double longueurMoyenne = reseauComplet.getLongueur() / reseauComplet.getArcs().size();
+		double longueurMaxLigne = (double) longueurMax / nbLignes;
 		Arc arcFluxMax = arcPreced;
 
 		boolean stop = false;
@@ -252,7 +253,7 @@ public class IARoche extends IACreationLignes {
 					double scoreLongueur = (longueurMoyenne - arcVoisin.getLongueur()) / longMax;
 
 					double scoreArc = IMPORTANCE_FLUX * scoreFlux + IMPORTANCE_ANGLE * scoreAngle + IMPORTANCE_CORRESPONDANCES * scoreNbVoisins + IMPORTANCE_LONGUEUR * scoreLongueur;
-					if (scoreArc > 0 && angle >= ANGLE_MIN_REQUIS && (nouvelArcMax == null || scoreMax < scoreArc))
+					if (scoreArc >= 0 && angle >= ANGLE_MIN_REQUIS && (nouvelArcMax == null || scoreMax < scoreArc))
 					{
 						nouvelArcMax = arcVoisin;
 						scoreMax = scoreArc;
@@ -278,7 +279,7 @@ public class IARoche extends IACreationLignes {
 				} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
 					stop = true;
 				}
-				if (reseau.longueurLigne(ligne) > (double) longueurMax / nbLignes)
+				if (reseau.longueurLigne(ligne) > longueurMaxLigne)
 				{
 					stop = true;
 				}
@@ -286,6 +287,9 @@ public class IARoche extends IACreationLignes {
 			else
 			{
 				stop = true;
+				double longueurRestante = ((double) longueurMax / nbLignes) - reseau.longueurLigne(ligne);
+				if (longueurRestante > 0)
+					longueurMaxLigne += longueurRestante;
 			}
 		}
 	}
@@ -319,8 +323,12 @@ public class IARoche extends IACreationLignes {
 	private void lierStationsIsolees()
 	{
 		List<Station> stationsIsolees = reseau.stationsIsolees();
-		while (!stationsIsolees.isEmpty())
+		int iterationsSansModif = 0;
+		int nbStations = reseau.getStations().size();
+		while (!stationsIsolees.isEmpty() && iterationsSansModif < nbStations)
 		{
+			iterationsSansModif++;
+			
 			// Recherche de la station isolée la plus proche d'un terminus
 			Station isoleePlusProche = null;
 			Station plusProche = null;
@@ -354,6 +362,7 @@ public class IARoche extends IACreationLignes {
 					Arc nouvelArc = reseau.ajouterArc(plusProche, isoleePlusProche, lignePlusProche);
 					fenetre.majReseau(reseau);
 					continuerLigne(lignePlusProche, isoleePlusProche, nouvelArc);
+					iterationsSansModif = 0;
 				} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
 					// Rien
 				}
@@ -363,10 +372,10 @@ public class IARoche extends IACreationLignes {
 				lierStationsProches();
 			}
 
+			fusionnerLignes();
+			
 			stationsIsolees = reseau.stationsIsolees();
 		}
-
-		fusionnerLignes();
 	}
 
 	private void lierStationsProches()
@@ -393,7 +402,7 @@ public class IARoche extends IACreationLignes {
 						double sommeDist = Double.MAX_VALUE;
 						for (Arc a : reseau.getArcsVoisins(s))
 						{
-							double dist = new Arc(isolee, a.getExtremite1(), null).getLongueur() + new Arc(isolee, a.getExtremite2(), null).getLongueur();
+							double dist = a.getExtremite1().distance(isolee) + a.getExtremite2().distance(isolee);
 							if (sommeDist > dist && calculerAngle(a.getExtremite1(), isolee, a.getExtremite2()) > ANGLE_MIN_REQUIS)
 							{
 								sommeDist = dist;

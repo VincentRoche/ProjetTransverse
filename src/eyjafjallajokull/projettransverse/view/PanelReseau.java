@@ -26,7 +26,7 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 	private int sourisY;
 
 	private static final int TAILLE_ROND = 15;
-	private static final int EPAISSEUR_TRAIT = 4;
+	private static final int EPAISSEUR_TRAIT = 5;
 
 	//Constructeurs
 	public PanelReseau(Reseau reseau, double multiplicateur) {

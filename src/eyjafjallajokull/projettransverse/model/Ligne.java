@@ -34,7 +34,6 @@ public class Ligne {
 	private final int numero;
 	private final Color couleur;
 
-	private double longueur;
 	private List<Ligne> correspondances;
 
 	public Ligne() {

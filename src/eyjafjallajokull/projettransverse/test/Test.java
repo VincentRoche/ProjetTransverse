@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import eyjafjallajokull.projettransverse.model.Arc;
 import eyjafjallajokull.projettransverse.model.IARoche;
 import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.model.Station;
@@ -104,7 +103,7 @@ public class Test {
 
 		// Placement des lignes avec l'IA
 		FenetrePlan f = new FenetrePlan(reseau, 0.6);
-		reseau = new IARoche(reseau, 18, 25000, f).placerLignes();
+		reseau = new IARoche(reseau, 18, 23000, f).placerLignes();
 		// Fenêtre
 		f.majReseau(null);
 
