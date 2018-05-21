@@ -146,15 +146,6 @@ public class Arc {
 	 */
 	public boolean croise(Arc a)
 	{
-		/*int eX = extremite2.getCoordonneeX() - extremite1.getCoordonneeX();
-		int eY = extremite2.getCoordonneeY() - extremite1.getCoordonneeY();
-		int fX = a.extremite2.getCoordonneeX() - a.extremite1.getCoordonneeX();
-		int fY = a.extremite2.getCoordonneeY() - a.extremite1.getCoordonneeY();
-		
-		int pX = -eY;
-		int pY = eX;
-		float */
-		
 		int p0_x = extremite1.getCoordonneeX(), p0_y = extremite1.getCoordonneeY();
 		int p1_x = extremite2.getCoordonneeX(), p1_y = extremite2.getCoordonneeY();
 		int p2_x = a.extremite1.getCoordonneeX(), p2_y = a.extremite1.getCoordonneeY();
@@ -185,22 +176,6 @@ public class Arc {
 	        return false; // No collision
 	   
 	    return true;
-		
-		/*int s1_x, s1_y, s2_x, s2_y;
-		s1_x = p1_x - p0_x;
-		s1_y = p1_y - p0_y;
-		s2_x = p3_x - p2_x;
-		s2_y = p3_y - p2_y;
-
-		float d = -s2_x * s1_y + s1_x * s2_y;
-		if (d == 0)
-			return false;
-		
-		float s, t;
-		s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / d;
-		t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / d;
-		
-		return (s >= 0 && s <= 1 && t >= 0 && t <= 1);*/
 	}
 
 	@Override

@@ -269,9 +269,18 @@ public class Reseau implements Cloneable {
 	/**
 	 * @return Longueur totale du réseau (tous les arcs).
 	 */
-	public long getLongueur() {
-		long l = 0;
+	public double getLongueur() {
+		double l = 0;
 		for (Arc a : arcs)
+		{
+			l += a.getLongueur();
+		}
+		return l;
+	}
+	
+	public double longueurLigne(Ligne ligne) {
+		double l = 0;
+		for (Arc a : getArcs(ligne))
 		{
 			l += a.getLongueur();
 		}

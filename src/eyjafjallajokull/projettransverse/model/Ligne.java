@@ -1,6 +1,8 @@
 package eyjafjallajokull.projettransverse.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -31,8 +33,9 @@ public class Ligne {
 
 	private final int numero;
 	private final Color couleur;
-	
+
 	private double longueur;
+	private List<Ligne> correspondances;
 
 	public Ligne() {
 		this.numero = nbLignes++;
@@ -44,19 +47,24 @@ public class Ligne {
 			Random rand = new Random();
 			this.couleur = new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
 		}
+		this.correspondances = new ArrayList<Ligne>();
 	}
-	
+
 	public Color getCouleur()
 	{
 		return couleur;
 	}
 
-	public double getLongueur() {
-		return longueur;
+	public List<Ligne> getCorrespondances() {
+		return new ArrayList<Ligne>(correspondances);
 	}
 
-	public void setLongueur(double longueur) {
-		this.longueur = longueur;
+	/**
+	 * @param ligne Ligne à ajouter aux correspondances.
+	 */
+	public void ajouterCorrespondance(Ligne ligne) {
+		if (!ligne.equals(this) && !correspondances.contains(ligne))
+			this.correspondances.add(ligne);
 	}
 
 	@Override
