@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import eyjafjallajokull.projettransverse.model.Arc;
 import eyjafjallajokull.projettransverse.model.IARoche;
 import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.model.Station;
@@ -85,12 +86,12 @@ public class Test {
 				}
 			}
 		}
-		catch(IOException exc){
+		catch(IOException exc) {
 			exc.printStackTrace();
 		}
-		finally{
-			try{
-				if(fluxEntree!=null){
+		finally {
+			try {
+				if (fluxEntree!=null) {
 					// Fermeture du flux vers le fichier
 					fluxEntree.close();
 				}
@@ -103,7 +104,7 @@ public class Test {
 
 		// Placement des lignes avec l'IA
 		FenetrePlan f = new FenetrePlan(reseau, 0.6);
-		reseau = new IARoche(reseau, 16, 100000, f).placerLignes();
+		reseau = new IARoche(reseau, 18, 25000, f).placerLignes();
 		// Fenêtre
 		f.majReseau(null);
 
@@ -115,6 +116,7 @@ public class Test {
 		for (Arc a : reseau.getArcs())
 		{
 			System.out.println(a);
+			System.out.println(a.getLongueur());
 		}
 		for (Voyageur v : reseau.getVoyageurs())
 		{
@@ -122,6 +124,7 @@ public class Test {
 		}*/
 
 
+		System.out.println("Longueur du réseau = " + reseau.getLongueur());
 		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
 	}
 

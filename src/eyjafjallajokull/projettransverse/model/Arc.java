@@ -7,7 +7,7 @@ public class Arc {
 
 	private final Station extremite1;
 	private final Station extremite2;
-	private final Ligne ligne;
+	private Ligne ligne;
 
 	/** Utilisé pour la simulation des déplacements : nombre de voyageurs entrés sur l'arc par l'extrémité 1 dans l'unité de temps actuelle. */
 	private int entreesExtrem1;
@@ -50,6 +50,13 @@ public class Arc {
 	 */
 	public Ligne getLigne() {
 		return ligne;
+	}
+
+	/**
+	 * @param ligne Ligne à définir.
+	 */
+	public void setLigne(Ligne ligne) {
+		this.ligne = ligne;
 	}
 
 	/**

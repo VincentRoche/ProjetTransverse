@@ -23,10 +23,16 @@ public class Ligne {
 			new Color(90, 35, 10), 
 			new Color(0, 100, 60), 
 			new Color(130, 200, 230), 
-			new Color(100, 0, 130)};
+			new Color(100, 0, 130), 
+			new Color(255, 20, 0), 
+			new Color(60, 145, 220), 
+			new Color(0, 150, 65), 
+			new Color(220, 90, 180)};
 
 	private final int numero;
 	private final Color couleur;
+	
+	private double longueur;
 
 	public Ligne() {
 		this.numero = nbLignes++;
@@ -43,6 +49,14 @@ public class Ligne {
 	public Color getCouleur()
 	{
 		return couleur;
+	}
+
+	public double getLongueur() {
+		return longueur;
+	}
+
+	public void setLongueur(double longueur) {
+		this.longueur = longueur;
 	}
 
 	@Override

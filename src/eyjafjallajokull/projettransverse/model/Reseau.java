@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Représente un réseau de stations et de lignes.
@@ -15,6 +16,7 @@ public class Reseau implements Cloneable {
 	private List<Voyageur> voyageurs;
 	private List<Ligne> lignes;
 	private int xMax, yMax;
+	private double fluxMoyen;
 
 	/** Temps ajouté par un changement de ligne dans un trajet. */
 	public final static int TEMPS_CORRESPONDANCE = 100;
@@ -122,12 +124,65 @@ public class Reseau implements Cloneable {
 		}
 		return null;
 	}
+	
+	/**
+	 * @return Liste des stations reliées à aucune ligne
+	 */
+	public List<Station> stationsIsolees()
+	{
+		List<Station> liste = new ArrayList<Station>();
+		for (Station s : stations)
+		{
+			if (getArcsVoisins(s).isEmpty())
+				liste.add(s);
+		}
+		return liste;
+	}
+	
+	/**
+	 * @param station
+	 * @return Liste des arcs étant le dernier arc d'une ligne à la station donnée.
+	 */
+	public List<Arc> getArcsTerminus(Station station)
+	{
+		Map<Ligne, Integer> nbArcs = new HashMap<Ligne, Integer>();
+		Map<Ligne, Arc> arcLigne = new HashMap<Ligne, Arc>();
+		for (Arc a : getArcsVoisins(station))
+		{
+			Ligne l = a.getLigne();
+			if (!nbArcs.containsKey(l))
+				nbArcs.put(l, 1);
+			else
+				nbArcs.put(l, nbArcs.get(l) + 1);
+			arcLigne.put(l, a);
+		}
+		List<Arc> terminus = new ArrayList<Arc>();
+		for (Entry<Ligne, Integer> entry : nbArcs.entrySet())
+		{
+			if (entry.getValue() == 1)
+				terminus.add(arcLigne.get(entry.getKey()));
+		}
+		return terminus;
+	}
 
 	/**
 	 * @return Arcs du réseau.
 	 */
 	public List<Arc> getArcs() {
 		return new ArrayList<Arc>(arcs);
+	}
+
+	/**
+	 * @return Arcs d'une ligne.
+	 */
+	public List<Arc> getArcs(Ligne ligne) {
+		List<Arc> liste = new ArrayList<Arc>();
+		for (Arc a : arcs)
+		{
+			if (a.getLigne() != null && a.getLigne().equals(ligne))
+				liste.add(a);
+		}
+		return liste;
 	}
 
 	/**
@@ -224,6 +279,13 @@ public class Reseau implements Cloneable {
 	}
 
 	/**
+	 * @return Flux moyen sur les arcs.
+	 */
+	public double getFluxMoyen() {
+		return fluxMoyen;
+	}
+
+	/**
 	 * Calcule les chemins les plus courts pour chaque station et voyageur (les résultats sont dans chaque station), et le flux de chaque arc.
 	 */
 	public void calculerCheminsCourts()
@@ -253,6 +315,14 @@ public class Reseau implements Cloneable {
 				a.incrementerFlux();
 			}
 		}
+		
+		// Calcul du flux moyen par arc
+		long somme = 0;
+		for (Arc a : arcs)
+		{
+			somme += a.getFlux();
+		}
+		fluxMoyen = (double) somme / arcs.size();
 	}
 
 	/**
