@@ -8,6 +8,11 @@ import eyjafjallajokull.projettransverse.view.FenetrePlan;
 public class IARoche extends IACreationLignes {
 
 	/**
+	 * Réseau qui contient tous les arcs possibles.
+	 */
+	Reseau reseauComplet;
+
+	/**
 	 * Les virages formant un angle inférieur à celui-ci seront préférables sur une ligne.
 	 */
 	public static final int ANGLE_MIN_IDEAL = 125;
@@ -34,7 +39,7 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Importance de la longueur dans le choix d'un arc pour prolonger une ligne.
 	 */
-	private static final double IMPORTANCE_LONGUEUR = 2;
+	private static final double IMPORTANCE_LONGUEUR = 1;
 
 	public IARoche(Reseau reseau, int nbLignes, int longueurMax, FenetrePlan fenetre) {
 		super(reseau, nbLignes, longueurMax, fenetre);
@@ -45,19 +50,18 @@ public class IARoche extends IACreationLignes {
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Etape 1 : création d'un réseau reliant toutes les stations, sans arcs qui se croisent
 
-		Reseau r; // Réseau à remplir
 		try {
-			r = reseau.clone();
+			reseauComplet = reseau.clone();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return null;
 		}
 
-		List<Station> stations = r.getStations();
+		List<Station> stations = reseauComplet.getStations();
 		for (int i=0; i < stations.size(); i++)
 		{
 			Station s1 = stations.get(i);
-			List<Arc> voisinsS1 = r.getArcsVoisins(s1);
+			List<Arc> voisinsS1 = reseauComplet.getArcsVoisins(s1);
 
 			// Tentative d'ajout d'un arc entre s1 et toutes les autres stations
 			for (int j = i + 1; j < stations.size(); j++)
@@ -66,15 +70,15 @@ public class IARoche extends IACreationLignes {
 
 				if (!s1.equals(s2))
 				{
-					List<Arc> voisinsS2 = r.getArcsVoisins(s2);
+					List<Arc> voisinsS2 = reseauComplet.getArcsVoisins(s2);
 
 					double longueur = s1.distance(s2);
-					if (longueur < longueurMax / (r.getStations().size() / 3))
+					if (longueur < longueurMax / (reseauComplet.getStations().size() / 3))
 					{
 						// Recherche dans les arcs déjà ajoutés d'arcs qui croisent celui qu'on veut ajouter ou dont l'angle est trop faible
 						boolean ajouterArc = true;
 						List<Arc> arcsASupprimer = new ArrayList<Arc>();
-						for (Arc a : r.getArcs())
+						for (Arc a : reseauComplet.getArcs())
 						{
 							// Si ça se croise
 							if (!a.getExtremite1().equals(s1) && !a.getExtremite1().equals(s2) && !a.getExtremite2().equals(s1) && !a.getExtremite2().equals(s2))
@@ -126,12 +130,12 @@ public class IARoche extends IACreationLignes {
 							// Suppression des arcs qu'il croise
 							for (Arc a : arcsASupprimer)
 							{
-								r.supprimerArc(a);
+								reseauComplet.supprimerArc(a);
 							}
 
 							// Ajout du nouvel arc
 							try {
-								r.ajouterArc(s1, s2, null);
+								reseauComplet.ajouterArc(s1, s2, null);
 							} catch (TropDArcsDeLaMemeLigneException e) {
 								e.printStackTrace();
 							} catch (ArcDejaExistantException e) {
@@ -141,138 +145,50 @@ public class IARoche extends IACreationLignes {
 					}
 				}
 			}
-			fenetre.majReseau(r);
+			fenetre.majReseau(reseauComplet);
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Etape 2 : Calcul des chemins les plus courts et du flux de chaque arc (nombre de voyageurs qui l'empruntent).
 
-		r.calculerCheminsCourts();
+		reseauComplet.calculerCheminsCourts();
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Etape 3 : Placement des lignes sur les arcs aux flux les plus élevés, sans faire de virages absurdes
 
-		// Valeurs utiles aux calculs
-
-		// Pour chaque ligne
 		for (int i = 0; i < nbLignes; i++)
 		{
 			Ligne ligne = reseau.ajouterLigne();
-			placerLigne(ligne, r);
+			placerLigne(ligne);
+			lierStationsProches();
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////
 		// Etape 4 : Fusion des lignes qui sont mises bout à bout pour économiser une ligne
 
-		// Recherche de stations qui ont 2 terminus
-		for (Station s : reseau.getStations())
-		{
-			// Comptage des arcs
-			List<Arc> terminus = reseau.getArcsTerminus(s);
-			if (terminus.size() >= 2)
-			{
-				// Fusion des 2 lignes
-				Arc arcR = terminus.get(1);
-				Arc arcC = terminus.get(0);
-				Ligne ligneRetiree = arcR.getLigne();
-				Ligne ligneConservee = arcC.getLigne();
-				if (calculerAngle(arcR.getAutreExtremite(s), s, arcC.getAutreExtremite(s)) >= ANGLE_MIN_IDEAL)
-				{
-					for (Arc a : reseau.getArcs(ligneRetiree))
-					{
-						a.setLigne(ligneConservee);
-						fenetre.majReseau(reseau);
-					}
-					placerLigne(ligneRetiree, r);
-				}
-			}
-		}
+		fusionnerLignes();
 
 		///////////////////////////////////////////////////////////////////////////
 		// Etape 5 : Poursuite des lignes proches de stations pas encore raccordées
 
-		List<Station> stationsIsolees = reseau.stationsIsolees();
-		while (!stationsIsolees.isEmpty())
-		{
-			// Recherche de la station isolée la plus proche d'un terminus
-			Station isoleePlusProche = null;
-			Station plusProche = null;
-			Ligne lignePlusProche = null;
-			double distPlusProche = Integer.MAX_VALUE;
-			for (Station isolee : stationsIsolees)
-			{
-				// Recherche de terminus
-				for (Station s : reseau.getStations())
-				{
-					List<Arc> terminus = reseau.getArcsTerminus(s);
-					if (!terminus.isEmpty())
-					{
-						Arc arcTerminus = terminus.get(0);
-						Arc temp = new Arc(isolee, s, null);
-						double distance = temp.getLongueur();
-						if (calculerAngle(isolee, s, arcTerminus.getAutreExtremite(s)) >= ANGLE_MIN_REQUIS && distPlusProche > distance && r.getArcs().contains(temp))
-						{
-							isoleePlusProche = isolee;
-							plusProche = s;
-							distPlusProche = distance;
-							lignePlusProche = arcTerminus.getLigne();
-						}
-					}
-				}
-			}
-
-			if (isoleePlusProche != null)
-			{
-				try {
-					Arc nouvelArc = reseau.ajouterArc(plusProche, isoleePlusProche, lignePlusProche);
-					fenetre.majReseau(reseau);
-					continuerLigne(lignePlusProche, isoleePlusProche, nouvelArc, r);
-				} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
-					// Rien
-				}
-			}
-			else
-			{
-				// Suppression de la ligne la plus courte pour essayer de la replacer
-				Ligne plusCourte = null;
-				double longueur = 0;
-				for (Ligne l : reseau.getLignes())
-				{
-					double longueurLigne = reseau.longueurLigne(l);
-					if (plusCourte == null || longueur > longueurLigne)
-					{
-						plusCourte = l;
-						longueur = longueurLigne;
-					}
-				}
-				for (Arc a : reseau.getArcs(plusCourte))
-				{
-					reseau.supprimerArc(a);
-				}
-				fenetre.majReseau(reseau);
-				placerLigne(plusCourte, r);
-			}
-
-			stationsIsolees = reseau.stationsIsolees();
-		}
+		lierStationsIsolees();
 
 
 		return reseau;
 	}
 
-	void placerLigne(Ligne ligne, Reseau reseauComplet)
+	private void placerLigne(Ligne ligne)
 	{
-		Reseau r = reseauComplet;
-
 		// Ajout du premier arc de flux maximal
 		Arc premierArc = null;
-		for (Arc a : r.getArcs())
+		for (Arc a : reseauComplet.getArcs())
 		{
 			if ((premierArc == null || premierArc.getFlux() < a.getFlux()) && !reseau.getArcs().contains(a)
-					&& reseau.getArcsVoisins(a.getExtremite1()).isEmpty() && reseau.getArcsVoisins(a.getExtremite2()).isEmpty())
+					&& (reseau.getArcsVoisins(a.getExtremite1()).isEmpty() || reseau.getArcsVoisins(a.getExtremite2()).isEmpty()))
 				premierArc = a;
 		}
+
 		try {
 			reseau.ajouterArc(premierArc.getExtremite1(), premierArc.getExtremite2(), ligne);
 		} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
@@ -283,14 +199,13 @@ public class IARoche extends IACreationLignes {
 		Station[] extremites = {premierArc.getExtremite1(), premierArc.getExtremite2()};
 		for (Station extremite : extremites)
 		{
-			continuerLigne(ligne, extremite, premierArc, r);
+			continuerLigne(ligne, extremite, premierArc);
 		}
 	}
 
-	private void continuerLigne(Ligne ligne, Station extremite, Arc arcPreced, Reseau reseauComplet) {
+	private void continuerLigne(Ligne ligne, Station extremite, Arc arcPreced) {
 		double longueurMoyenne = reseauComplet.getLongueur() / reseauComplet.getArcs().size();
 		Arc arcFluxMax = arcPreced;
-		Reseau r = reseauComplet;
 
 		boolean stop = false;
 		while (!stop) // Jusqu'à ce qu'on ne puisse plus continuer la ligne
@@ -303,7 +218,7 @@ public class IARoche extends IACreationLignes {
 			int fluxMax = 0;
 			int nbVoisinsMax = 0;
 			double longMax = 0;
-			for (Arc arcVoisin : r.getArcsVoisins(extremite))
+			for (Arc arcVoisin : reseauComplet.getArcsVoisins(extremite))
 			{
 				if (!arcVoisin.equals(arcFluxMax) && !reseau.getArcs().contains(arcVoisin)) // On ne veut pas remplacer un arc existant
 				{
@@ -313,7 +228,7 @@ public class IARoche extends IACreationLignes {
 				}
 			}
 			// Sélection de l'arc voisin au plus grand flux et d'angle supérieur à ANGLE_MIN
-			for (Arc arcVoisin : r.getArcsVoisins(extremite))
+			for (Arc arcVoisin : reseauComplet.getArcsVoisins(extremite))
 			{
 				if (!arcVoisin.equals(arcFluxMax) && !reseau.getArcs().contains(arcVoisin)) // On ne veut pas remplacer un arc existant
 				{
@@ -330,14 +245,14 @@ public class IARoche extends IACreationLignes {
 					double angle = calculerAngle(autreExtremite, extremite, extremiteVoisin);
 					double scoreAngle = (angle - ANGLE_MIN_IDEAL) / ANGLE_MIN_IDEAL;
 
-					double scoreFlux = (double) (arcVoisin.getFlux() - r.getFluxMoyen() / 2) / fluxMax;
+					double scoreFlux = (double) (arcVoisin.getFlux() - reseauComplet.getFluxMoyen() / 2) / fluxMax;
 
 					double scoreNbVoisins = (nbVoisinsMax == 0) ? 1 : 1 - (double) reseau.getArcsVoisins(extremiteVoisin).size() / nbVoisinsMax;
 
 					double scoreLongueur = (longueurMoyenne - arcVoisin.getLongueur()) / longMax;
 
 					double scoreArc = IMPORTANCE_FLUX * scoreFlux + IMPORTANCE_ANGLE * scoreAngle + IMPORTANCE_CORRESPONDANCES * scoreNbVoisins + IMPORTANCE_LONGUEUR * scoreLongueur;
-					if (!correspondanceDejaVue && scoreArc > 0 && angle >= ANGLE_MIN_REQUIS && (nouvelArcMax == null || scoreMax < scoreArc))
+					if (scoreArc > 0 && angle >= ANGLE_MIN_REQUIS && (nouvelArcMax == null || scoreMax < scoreArc))
 					{
 						nouvelArcMax = arcVoisin;
 						scoreMax = scoreArc;
@@ -371,6 +286,139 @@ public class IARoche extends IACreationLignes {
 			else
 			{
 				stop = true;
+			}
+		}
+	}
+
+	private void fusionnerLignes() {
+		// Recherche de stations qui ont 2 terminus
+		for (Station s : reseau.getStations())
+		{
+			// Comptage des arcs
+			List<Arc> terminus = reseau.getArcsTerminus(s);
+			if (terminus.size() >= 2)
+			{
+				// Fusion des 2 lignes
+				Arc arcR = terminus.get(1);
+				Arc arcC = terminus.get(0);
+				Ligne ligneRetiree = arcR.getLigne();
+				Ligne ligneConservee = arcC.getLigne();
+				if (calculerAngle(arcR.getAutreExtremite(s), s, arcC.getAutreExtremite(s)) >= ANGLE_MIN_IDEAL)
+				{
+					for (Arc a : reseau.getArcs(ligneRetiree))
+					{
+						a.setLigne(ligneConservee);
+						fenetre.majReseau(reseau);
+					}
+					placerLigne(ligneRetiree);
+				}
+			}
+		}
+	}
+
+	private void lierStationsIsolees()
+	{
+		List<Station> stationsIsolees = reseau.stationsIsolees();
+		while (!stationsIsolees.isEmpty())
+		{
+			// Recherche de la station isolée la plus proche d'un terminus
+			Station isoleePlusProche = null;
+			Station plusProche = null;
+			Ligne lignePlusProche = null;
+			double distPlusProche = Integer.MAX_VALUE;
+			for (Station isolee : stationsIsolees)
+			{
+				// Recherche de terminus
+				for (Station s : reseau.getStations())
+				{
+					List<Arc> terminus = reseau.getArcsTerminus(s);
+					if (!terminus.isEmpty())
+					{
+						Arc arcTerminus = terminus.get(0);
+						Arc temp = new Arc(isolee, s, null);
+						double distance = temp.getLongueur();
+						if (calculerAngle(isolee, s, arcTerminus.getAutreExtremite(s)) >= ANGLE_MIN_REQUIS && distPlusProche > distance && reseauComplet.getArcs().contains(temp))
+						{
+							isoleePlusProche = isolee;
+							plusProche = s;
+							distPlusProche = distance;
+							lignePlusProche = arcTerminus.getLigne();
+						}
+					}
+				}
+			}
+
+			if (isoleePlusProche != null)
+			{
+				try {
+					Arc nouvelArc = reseau.ajouterArc(plusProche, isoleePlusProche, lignePlusProche);
+					fenetre.majReseau(reseau);
+					continuerLigne(lignePlusProche, isoleePlusProche, nouvelArc);
+				} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
+					// Rien
+				}
+			}
+			else
+			{
+				lierStationsProches();
+			}
+
+			stationsIsolees = reseau.stationsIsolees();
+		}
+
+		fusionnerLignes();
+	}
+
+	private void lierStationsProches()
+	{
+		List<Station> stationsIsolees = reseau.stationsIsolees();
+
+		// Recherche d'une station proche avec une ligne qui y passe
+		Station isoleePlusProche = null;
+		double distPlusProche = Double.MAX_VALUE;
+		Arc arcPlusProche = null;
+		for (Station isolee : stationsIsolees)
+		{
+			for (Station s : reseau.getStations())
+			{
+				List<Arc> voisins = reseau.getArcsVoisins(s);
+				if (!voisins.isEmpty())
+				{
+					Arc temp = new Arc(isolee, s, null);
+					double distance = temp.getLongueur();
+					if (distPlusProche > distance)
+					{
+						// Sélection de l'arc le plus proche parmi les voisins
+						Arc arcChoisi = null;
+						double sommeDist = Double.MAX_VALUE;
+						for (Arc a : reseau.getArcsVoisins(s))
+						{
+							double dist = new Arc(isolee, a.getExtremite1(), null).getLongueur() + new Arc(isolee, a.getExtremite2(), null).getLongueur();
+							if (sommeDist > dist && calculerAngle(a.getExtremite1(), isolee, a.getExtremite2()) > ANGLE_MIN_REQUIS)
+							{
+								sommeDist = dist;
+								arcChoisi = a;
+							}
+						}
+						if (arcChoisi != null)
+						{
+							arcPlusProche = arcChoisi;
+							isoleePlusProche = isolee;
+							distPlusProche = distance;
+						}
+					}
+				}
+			}
+		}
+		if (arcPlusProche != null)
+		{
+			try {
+				reseau.supprimerArc(arcPlusProche);
+				reseau.ajouterArc(arcPlusProche.getExtremite1(), isoleePlusProche, arcPlusProche.getLigne());
+				reseau.ajouterArc(arcPlusProche.getExtremite2(), isoleePlusProche, arcPlusProche.getLigne());
+				fenetre.majReseau();
+			} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
+				e.printStackTrace();
 			}
 		}
 	}
