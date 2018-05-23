@@ -4,10 +4,14 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import eyjafjallajokull.projettransverse.model.Arc;
@@ -21,6 +25,7 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 	//Attributs
 	private Reseau reseau;
 	private final double multiplicateur;
+	private Image img;
 
 	private int sourisX;
 	private int sourisY;
@@ -29,14 +34,22 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 	private static final int EPAISSEUR_TRAIT = 5;
 
 	//Constructeurs
-	public PanelReseau(Reseau reseau, double multiplicateur) {
+	public PanelReseau(Reseau reseau, double multiplicateur, File imageFond) {
 		this.reseau = reseau;
 		this.multiplicateur = multiplicateur;
+		try {
+			this.img = ImageIO.read(imageFond);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		addMouseMotionListener(this);
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+
+		if (img != null)
+			g.drawImage(img, 0, 0, (int) (reseau.getxMax() * multiplicateur), (int) (reseau.getyMax() * multiplicateur), this);
 
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Anti crénelage
 
@@ -67,8 +80,8 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 			if (sourisX >= xb && sourisX <= xb + TAILLE_ROND * multiplicateur && sourisY >= yb && sourisY <= yb + TAILLE_ROND * multiplicateur)
 				g.drawString(s.getNom(), (int) (xb + TAILLE_ROND * multiplicateur), yb);
 			g.setColor(Color.WHITE);
-			int ecart = (int) ((TAILLE_ROND / 6) * multiplicateur);
-			g.fillOval(xb + ecart, yb + ecart, (int) ((TAILLE_ROND - ecart * 2) * multiplicateur), (int) ((TAILLE_ROND - ecart * 2) * multiplicateur));
+			double ecart = (TAILLE_ROND / 6);
+			g.fillOval((int) Math.ceil(xb + ecart / 2), (int) Math.ceil(yb + ecart / 2), (int) Math.floor((TAILLE_ROND - ecart * 2) * multiplicateur), (int) Math.floor((TAILLE_ROND - ecart * 2) * multiplicateur));
 		}
 	}
 
@@ -85,7 +98,7 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 		revalidate();
 		repaint();
 	}
-	
+
 	/**
 	 * @param reseau Redéfinit le réseauy à afficher
 	 */

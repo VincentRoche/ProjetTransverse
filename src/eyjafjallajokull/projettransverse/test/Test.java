@@ -103,7 +103,7 @@ public class Test {
 
 
 		// Placement des lignes avec l'IA
-		FenetrePlan f = new FenetrePlan(reseau, 0.6);
+		FenetrePlan f = new FenetrePlan(reseau, 0.5);
 		reseau = new IARoche(reseau, 18, 25000, f).placerLignes();
 		List<Station> isolees = reseau.stationsIsolees();
 		int nbTotal = reseau.getStations().size();
@@ -113,25 +113,25 @@ public class Test {
 			reseau.supprimerStation(s);
 		}
 		// Fenêtre
-		f.majReseau(null);
+		f.majReseau();
 
 		// Affichage des données
 		/*for (Station s : reseau.getStations())
 		{
 			System.out.println(s);
-		}
-		for (Arc a : reseau.getArcs())
+		}*/
+		/*for (Arc a : reseau.getArcs())
 		{
 			System.out.println(a);
 			System.out.println(a.getLongueur());
-		}
-		for (Voyageur v : reseau.getVoyageurs())
+		}*/
+		/*for (Voyageur v : reseau.getVoyageurs())
 		{
 			System.out.println(v);
 		}*/
 
 
-		System.out.println((nbTotal - nbIsolees) + " stations dans le réseau.");
+		System.out.println((nbTotal - nbIsolees) + "/" + nbTotal + " stations dans le réseau.");
 		System.out.println("Longueur du réseau = " + reseau.getLongueur());
 		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer(isolees));
 	}

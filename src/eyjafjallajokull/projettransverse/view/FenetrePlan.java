@@ -1,5 +1,7 @@
 package eyjafjallajokull.projettransverse.view;
 
+import java.io.File;
+
 import javax.swing.JFrame;
 
 import eyjafjallajokull.projettransverse.model.Reseau;
@@ -24,12 +26,12 @@ public class FenetrePlan extends JFrame {
 	}
 
 	private void build() {
-		setTitle("Ligne de métro"); 
+		setTitle("Carte du réseau"); 
 		setSize((int) (reseau.getxMax() * multiplicateur), (int) (reseau.getyMax() * multiplicateur)); 
 		setLocationRelativeTo(null); 
 		setResizable(true); 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		panelReseau = new PanelReseau(reseau, multiplicateur);
+		panelReseau = new PanelReseau(reseau, multiplicateur, new File("Paris.jpg"));
 		add(panelReseau);
 		setVisible(true);
 	}

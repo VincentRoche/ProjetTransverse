@@ -15,7 +15,7 @@ public class Arc {
 	private int entreesExtrem2;
 	/** Utilisé pour la simulation des déplacements : nombre maximal de voyageurs pouvant entrer dans une extrémité de l'arc en une unité de temps. */
 	private int flux;
-	private final static int DEBIT_ENTREE_MAX = 1; 
+	private final static int DEBIT_ENTREE_MAX = 5; 
 
 	Arc(Station extremite1, Station extremite2, Ligne ligne) {
 		this.extremite1 = extremite1;

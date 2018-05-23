@@ -257,7 +257,6 @@ public class IARoche extends IACreationLignes {
 			{
 				try {
 					Arc arc = reseau.ajouterArc(nouvelArcMax.getExtremite1(), nouvelArcMax.getExtremite2(), ligne);
-					fenetre.majReseau(reseau);
 					arcFluxMax = nouvelArcMax;
 					extremite = nouvelArcMax.getAutreExtremite(extremite);
 
@@ -284,6 +283,7 @@ public class IARoche extends IACreationLignes {
 					longueurMaxLigne += longueurRestante;
 			}
 		}
+		fenetre.majReseau(reseau);
 	}
 
 	private void fusionnerLignes() {
@@ -304,12 +304,12 @@ public class IARoche extends IACreationLignes {
 					for (Arc a : reseau.getArcs(ligneRetiree))
 					{
 						a.setLigne(ligneConservee);
-						fenetre.majReseau(reseau);
 					}
 					placerLigne(ligneRetiree);
 				}
 			}
 		}
+		fenetre.majReseau(reseau);
 	}
 
 	private void lierStationsIsolees()

@@ -373,7 +373,6 @@ public class Reseau implements Cloneable {
 		long sommeTemps = 0;
 		while (nbArrives < voyageursCalcules.size())
 		{
-			System.out.println(nbArrives);
 			// Remise des compteurs de voyageurs des arcs à 0
 			for (Arc a : arcs)
 			{
