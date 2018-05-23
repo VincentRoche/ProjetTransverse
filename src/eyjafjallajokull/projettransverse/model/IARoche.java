@@ -15,7 +15,7 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Les virages formant un angle inférieur à celui-ci seront préférables sur une ligne.
 	 */
-	public static final int ANGLE_MIN_IDEAL = 140;
+	public static final int ANGLE_MIN_IDEAL = 120;
 	/**
 	 * Les virages formant un angle inférieur à celui-ci seront interdits sur une ligne.
 	 */
@@ -27,7 +27,7 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Importance du flux dans le choix d'un arc pour prolonger une ligne.
 	 */
-	public static final double IMPORTANCE_FLUX = 1.5;
+	public static final double IMPORTANCE_FLUX = 1;
 	/**
 	 * Importance de l'angle avec le dernier arc dans le choix d'un arc pour prolonger une ligne.
 	 */
@@ -35,11 +35,11 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Importance du nombre de correspondances dans le choix d'un arc pour prolonger une ligne.
 	 */
-	public static final double IMPORTANCE_CORRESPONDANCES = 0.75;
+	public static final double IMPORTANCE_CORRESPONDANCES = 1;
 	/**
 	 * Importance de la longueur dans le choix d'un arc pour prolonger une ligne.
 	 */
-	private static final double IMPORTANCE_LONGUEUR = 0.5;
+	private static final double IMPORTANCE_LONGUEUR = 0.25;
 
 	public IARoche(Reseau reseau, int nbLignes, int longueurMax, FenetrePlan fenetre) {
 		super(reseau, nbLignes, longueurMax, fenetre);
@@ -185,7 +185,7 @@ public class IARoche extends IACreationLignes {
 		for (Arc a : reseauComplet.getArcs())
 		{
 			if ((premierArc == null || premierArc.getFlux() < a.getFlux()) && !reseau.getArcs().contains(a)
-					&& (reseau.getArcsVoisins(a.getExtremite1()).isEmpty() && reseau.getArcsVoisins(a.getExtremite2()).isEmpty()))
+					&& (reseau.getArcsVoisins(a.getExtremite1()).isEmpty() || reseau.getArcsVoisins(a.getExtremite2()).isEmpty()))
 				premierArc = a;
 		}
 

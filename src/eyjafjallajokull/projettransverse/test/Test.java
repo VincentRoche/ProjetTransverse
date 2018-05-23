@@ -124,7 +124,7 @@ public class Test {
 
 
 		System.out.println("Longueur du réseau = " + reseau.getLongueur());
-		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
+		//System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
 	}
 
 }
