@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
+import eyjafjallajokull.projettransverse.view.UtilitairesAffichage;
 
 public class IARoche extends IACreationLignes {
 
@@ -146,6 +147,13 @@ public class IARoche extends IACreationLignes {
 				}
 			}
 			fenetre.majReseau(reseauComplet);
+		}
+		
+		// Erreur s'il y a des stations non reliées
+		if (!reseauComplet.stationsIsolees().isEmpty())
+		{
+			UtilitairesAffichage.messageErreur("Il est impossible de relier les stations car la longueur maximale du réseau que vous avez entrée est trop faible. Veuillez modifier vos critères.");
+			return null;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.JTextField;
+
 /**
  * Représente un réseau de stations et de lignes.
  */
@@ -353,10 +355,16 @@ public class Reseau implements Cloneable {
 
 	/**
 	 * Evalue l'efficacité du réseau en simulant les trajets des voyageurs.
+	 * @param debit Nombre de voyageurs par seconde pouvant prendre une ligne.
 	 * @param stationsIgnorees Stations à ne pas prendre en compte.
+	 * @param fieldProgression Champ dans lequel indiquer la progression
 	 * @return Moyenne des temps de parcours des voyageurs
 	 */
-	public double evaluer(List<Station> stationsIgnorees) {
+	public double evaluer(int debit, List<Station> stationsIgnorees, JTextField fieldProgression) {
+		Arc.debitEntreeMax = debit;
+		
+		fieldProgression.setText("Calcul des chemins...");
+		
 		calculerCheminsCourts(stationsIgnorees);
 
 		// Initialisation des trajets
@@ -371,8 +379,12 @@ public class Reseau implements Cloneable {
 		}
 		int nbArrives = 0;
 		long sommeTemps = 0;
-		while (nbArrives < voyageursCalcules.size())
+		int total = voyageursCalcules.size();
+		while (nbArrives < total)
 		{
+			// Mise à jour de m'information de progression
+			fieldProgression.setText((total - nbArrives) + " voyageur(s) restants...");
+			
 			// Remise des compteurs de voyageurs des arcs à 0
 			for (Arc a : arcs)
 			{

@@ -8,10 +8,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import eyjafjallajokull.projettransverse.model.Arc;
@@ -34,14 +31,10 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 	private static final int EPAISSEUR_TRAIT = 5;
 
 	//Constructeurs
-	public PanelReseau(Reseau reseau, double multiplicateur, File imageFond) {
+	public PanelReseau(Reseau reseau, double multiplicateur, Image imageFond) {
 		this.reseau = reseau;
 		this.multiplicateur = multiplicateur;
-		try {
-			this.img = ImageIO.read(imageFond);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.img = imageFond;
 		addMouseMotionListener(this);
 	}
 
