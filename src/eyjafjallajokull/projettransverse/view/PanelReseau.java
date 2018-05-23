@@ -47,7 +47,6 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
 		if (img != null)
 			g.drawImage(img, 0, 0, (int) (reseau.getxMax() * multiplicateur), (int) (reseau.getyMax() * multiplicateur), this);
 
