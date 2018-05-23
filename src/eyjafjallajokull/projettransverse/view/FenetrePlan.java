@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 
 import eyjafjallajokull.projettransverse.controller.Main;
 import eyjafjallajokull.projettransverse.model.IACreationLignes;
-import eyjafjallajokull.projettransverse.model.IARoche;
+import eyjafjallajokull.projettransverse.model.IACriteresPonderes;
 import eyjafjallajokull.projettransverse.model.Reseau;
 import eyjafjallajokull.projettransverse.model.Station;
 
@@ -49,7 +49,7 @@ public class FenetrePlan extends JFrame implements ActionListener {
 		this.reseau = reseau;
 		this.multiplicateur = multiplicateur;
 		this.imageFond = imageFond;
-		this.ia = new IARoche(reseau, nbLignes, longueurMax, this);
+		this.ia = new IACriteresPonderes(reseau, nbLignes, longueurMax, this);
 		this.debit = debit;
 		build();
 	}

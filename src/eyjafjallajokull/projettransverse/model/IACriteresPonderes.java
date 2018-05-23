@@ -6,7 +6,7 @@ import java.util.List;
 import eyjafjallajokull.projettransverse.view.FenetrePlan;
 import eyjafjallajokull.projettransverse.view.UtilitairesAffichage;
 
-public class IARoche extends IACreationLignes {
+public class IACriteresPonderes extends IACreationLignes {
 
 	/**
 	 * Réseau qui contient tous les arcs possibles.
@@ -42,12 +42,14 @@ public class IARoche extends IACreationLignes {
 	 */
 	private static final double IMPORTANCE_LONGUEUR = 0.25;
 
-	public IARoche(Reseau reseau, int nbLignes, int longueurMax, FenetrePlan fenetre) {
+	public IACriteresPonderes(Reseau reseau, int nbLignes, int longueurMax, FenetrePlan fenetre) {
 		super(reseau, nbLignes, longueurMax, fenetre);
 	}
 
 	@Override
 	public Reseau placerLignes() {
+		Ligne.reinitialiserNb();
+
 		////////////////////////////////////////////////////////////////////////////////////////
 		// Etape 1 : création d'un réseau reliant toutes les stations, sans arcs qui se croisent
 
@@ -148,7 +150,7 @@ public class IARoche extends IACreationLignes {
 			}
 			fenetre.majReseau(reseauComplet);
 		}
-		
+
 		// Erreur s'il y a des stations non reliées
 		if (!reseauComplet.stationsIsolees().isEmpty())
 		{
@@ -168,8 +170,14 @@ public class IARoche extends IACreationLignes {
 		for (int i = 0; i < nbLignes; i++)
 		{
 			Ligne ligne = reseau.ajouterLigne();
-			placerLigne(ligne);
-			lierStationsProches();
+			boolean lignePlacee = placerLigne(ligne);
+			if (!lignePlacee)
+			{
+				UtilitairesAffichage.messageErreur("Toutes les lignes n'ont pas pu être placés, il y en a déjà suffisamment.");
+				break;
+			}
+			else
+				lierStationsProches();
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +194,12 @@ public class IARoche extends IACreationLignes {
 		return reseau;
 	}
 
-	private void placerLigne(Ligne ligne)
+	/**
+	 * Place une nouvelle ligne à l'endroit idéal.
+	 * @param ligne Ligne à placer.
+	 * @return true si ça a fonctionné, false si elle n'a pas pu être placée.
+	 */
+	private boolean placerLigne(Ligne ligne)
 	{
 		// Ajout du premier arc de flux maximal
 		Arc premierArc = null;
@@ -195,6 +208,11 @@ public class IARoche extends IACreationLignes {
 			if ((premierArc == null || premierArc.getFlux() < a.getFlux()) && !reseau.getArcs().contains(a)
 					&& (reseau.getArcsVoisins(a.getExtremite1()).isEmpty() || reseau.getArcsVoisins(a.getExtremite2()).isEmpty()))
 				premierArc = a;
+		}
+
+		if (premierArc == null)
+		{
+			return false;
 		}
 
 		try {
@@ -209,6 +227,7 @@ public class IARoche extends IACreationLignes {
 		{
 			continuerLigne(ligne, extremite, premierArc);
 		}
+		return true;
 	}
 
 	private void continuerLigne(Ligne ligne, Station extremite, Arc arcPreced) {
@@ -271,10 +290,6 @@ public class IARoche extends IACreationLignes {
 					// Enregistrement des correspondances
 					List<Arc> voisins = reseau.getArcsVoisins(arc.getExtremite1());
 					voisins.addAll(reseau.getArcsVoisins(arc.getExtremite2()));
-					for (Arc v : voisins)
-					{
-						ligne.ajouterCorrespondance(v.getLigne());
-					}
 				} catch (TropDArcsDeLaMemeLigneException | ArcDejaExistantException e) {
 					stop = true;
 				}
@@ -328,7 +343,7 @@ public class IARoche extends IACreationLignes {
 		while (!stationsIsolees.isEmpty() && iterationsSansModif < nbStations)
 		{
 			iterationsSansModif++;
-			
+
 			// Recherche de la station isolée la plus proche d'un terminus
 			Station isoleePlusProche = null;
 			Station plusProche = null;
@@ -373,7 +388,7 @@ public class IARoche extends IACreationLignes {
 			}
 
 			fusionnerLignes();
-			
+
 			stationsIsolees = reseau.stationsIsolees();
 		}
 	}

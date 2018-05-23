@@ -68,12 +68,20 @@ public class PanelReseau extends JPanel implements MouseMotionListener {
 			int xb = (int) ((s.getCoordonneeX() - TAILLE_ROND / 2) * multiplicateur);
 			int yb = (int) ((s.getCoordonneeY() - TAILLE_ROND / 2) * multiplicateur);
 			g.fillOval(xb, yb, (int) (TAILLE_ROND * multiplicateur), (int) (TAILLE_ROND * multiplicateur));
-			// Affichage du texte si la souris est sur le rond
-			if (sourisX >= xb && sourisX <= xb + TAILLE_ROND * multiplicateur && sourisY >= yb && sourisY <= yb + TAILLE_ROND * multiplicateur)
-				g.drawString(s.getNom(), (int) (xb + TAILLE_ROND * multiplicateur), yb);
 			g.setColor(Color.WHITE);
 			double ecart = (TAILLE_ROND / 6);
 			g.fillOval((int) Math.ceil(xb + ecart / 2), (int) Math.ceil(yb + ecart / 2), (int) Math.floor((TAILLE_ROND - ecart * 2) * multiplicateur), (int) Math.floor((TAILLE_ROND - ecart * 2) * multiplicateur));
+		}
+
+		// Affichage des noms des stations si on passe la souris dessus, en dernier pour que ce soit au premier plan.
+		g.setColor(Color.BLACK);
+		for (Station s : reseau.getStations())
+		{
+			int xb = (int) ((s.getCoordonneeX() - TAILLE_ROND / 2) * multiplicateur);
+			int yb = (int) ((s.getCoordonneeY() - TAILLE_ROND / 2) * multiplicateur);
+			// Affichage du texte si la souris est sur le rond
+			if (sourisX >= xb && sourisX <= xb + TAILLE_ROND * multiplicateur && sourisY >= yb && sourisY <= yb + TAILLE_ROND * multiplicateur)
+				g.drawString(s.getNom(), (int) (xb + TAILLE_ROND * multiplicateur), yb);
 		}
 	}
 

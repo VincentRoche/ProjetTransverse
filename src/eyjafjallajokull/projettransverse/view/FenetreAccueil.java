@@ -1,5 +1,6 @@
 package eyjafjallajokull.projettransverse.view;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -15,7 +16,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -50,8 +50,8 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 	}
 
 	private void build(){
-		setTitle("Projet Transverse"); 
-		setSize(600, 340); 
+		setTitle("Projet transverse"); 
+		setSize(550, 280); 
 		setLocationRelativeTo(null); 
 		setResizable(false); 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -66,18 +66,16 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 		JLabel label = new JLabel("Nombre de lignes à placer :");
 		panel1.add(label);
 		panel1.setLayout(new FlowLayout());
-		nbLignes = new JTextField();
+		nbLignes = new JTextField("18");
 		nbLignes.setColumns(3);
-		nbLignes.setText("18");
 		panel1.add(nbLignes);
 		panel.add(panel1);
 
 		JPanel panel2 = new JPanel();
 		JLabel label2 = new JLabel("Longueur maximale du réseau :");
 		panel2.add(label2);
-		longueur = new JTextField();
+		longueur = new JTextField("25000");
 		longueur.setColumns(6);
-		longueur.setText("25000");
 		panel2.add(longueur);
 		panel.add(panel2);
 
@@ -86,7 +84,7 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 		panel3.add(label3);
 		debit = new JTextField();
 		debit.setColumns(2);
-		debit.setText("5");
+		debit.setText("4");
 		panel3.add(debit);
 		panel.add(panel3);
 
@@ -95,9 +93,8 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 		ouvrirStations = new JButton("Sélectionner un fichier stations");
 		ouvrirStations.addActionListener(this);
 		panel4.add(ouvrirStations);
-		fieldStations = new JTextField();
+		fieldStations = new JTextField("StationsParis.txt");
 		fieldStations.setColumns(20);
-		fieldStations.setText("StationsParis.txt");
 		panel4.add(fieldStations);
 		panel.add(panel4);
 
@@ -106,9 +103,8 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 		ouvrirTrajets = new JButton("Sélectionner un fichier voyageurs");
 		ouvrirTrajets.addActionListener(this);
 		panel5.add(ouvrirTrajets);
-		fieldTrajets = new JTextField();
+		fieldTrajets = new JTextField("TrajetsParis.txt");
 		fieldTrajets.setColumns(20);
-		fieldTrajets.setText("TrajetsParis.txt");
 		panel5.add(fieldTrajets);
 		panel.add(panel5);
 
@@ -117,18 +113,21 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 		ouvrirImage = new JButton("Sélectionner une image de fond (facultatif)");
 		ouvrirImage.addActionListener(this);
 		panel6.add(ouvrirImage);
-		fieldImage = new JTextField();
+		fieldImage = new JTextField("Paris.jpg");
 		fieldImage.setColumns(20);
-		fieldImage.setText("Paris.jpg");
 		panel6.add(fieldImage);
 		panel.add(panel6);
 
 
 		validation = new JButton("Valider");
 		validation.addActionListener(this);
-		panel.add(validation);
 
-		return panel;
+		JPanel borderPanel = new JPanel();
+		borderPanel.setLayout(new BorderLayout());
+		borderPanel.add("Center", panel);
+		borderPanel.add("South", validation);
+		
+		return borderPanel;
 	}
 
 
