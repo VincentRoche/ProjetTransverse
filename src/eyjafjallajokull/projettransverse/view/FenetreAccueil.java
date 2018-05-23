@@ -51,7 +51,7 @@ public class FenetreAccueil extends JFrame implements ActionListener {
 
 	private void build(){
 		setTitle("Projet transverse"); 
-		setSize(550, 280); 
+		setSize(580, 280); 
 		setLocationRelativeTo(null); 
 		setResizable(false); 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 

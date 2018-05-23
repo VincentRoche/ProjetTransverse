@@ -83,7 +83,7 @@ public class FenetrePlan extends JFrame implements ActionListener {
 		panelSouth.add(label);
 		fieldTemps = new JTextField();
 		fieldTemps.setEditable(false);
-		fieldTemps.setColumns(20);
+		fieldTemps.setColumns(16);
 		panelSouth.add(fieldTemps);
 
 		panel.add("South", panelSouth);
