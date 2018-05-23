@@ -15,7 +15,7 @@ public class IARoche extends IACreationLignes {
 	/**
 	 * Les virages formant un angle inférieur à celui-ci seront préférables sur une ligne.
 	 */
-	public static final int ANGLE_MIN_IDEAL = 120;
+	public static final int ANGLE_MIN_IDEAL = 125;
 	/**
 	 * Les virages formant un angle inférieur à celui-ci seront interdits sur une ligne.
 	 */
@@ -234,14 +234,6 @@ public class IARoche extends IACreationLignes {
 				if (!arcVoisin.equals(arcFluxMax) && !reseau.getArcs().contains(arcVoisin)) // On ne veut pas remplacer un arc existant
 				{
 					Station extremiteVoisin = arcVoisin.getAutreExtremite(extremite);
-
-					// Recherche de si cette station a une correspondance avec une ligne déjà rencontrée
-					boolean correspondanceDejaVue = false;
-					for (Arc a : reseau.getArcsVoisins(extremiteVoisin))
-					{
-						if (ligne.getCorrespondances().contains(a.getLigne()))
-							correspondanceDejaVue = true;
-					}
 
 					double angle = calculerAngle(autreExtremite, extremite, extremiteVoisin);
 					double scoreAngle = (angle - ANGLE_MIN_IDEAL) / ANGLE_MIN_IDEAL;

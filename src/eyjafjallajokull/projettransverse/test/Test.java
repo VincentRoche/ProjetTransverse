@@ -3,6 +3,7 @@ package eyjafjallajokull.projettransverse.test;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import eyjafjallajokull.projettransverse.model.IARoche;
 import eyjafjallajokull.projettransverse.model.Reseau;
@@ -103,7 +104,14 @@ public class Test {
 
 		// Placement des lignes avec l'IA
 		FenetrePlan f = new FenetrePlan(reseau, 0.6);
-		reseau = new IARoche(reseau, 18, 23000, f).placerLignes();
+		reseau = new IARoche(reseau, 18, 25000, f).placerLignes();
+		List<Station> isolees = reseau.stationsIsolees();
+		int nbTotal = reseau.getStations().size();
+		int nbIsolees = isolees.size();
+		for (Station s : isolees)
+		{
+			reseau.supprimerStation(s);
+		}
 		// Fenêtre
 		f.majReseau(null);
 
@@ -123,8 +131,9 @@ public class Test {
 		}*/
 
 
+		System.out.println((nbTotal - nbIsolees) + " stations dans le réseau.");
 		System.out.println("Longueur du réseau = " + reseau.getLongueur());
-		//System.out.println("Moyenne des temps de parcours = " + reseau.evaluer());
+		System.out.println("Moyenne des temps de parcours = " + reseau.evaluer(isolees));
 	}
 
 }

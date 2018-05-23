@@ -124,6 +124,11 @@ public class Reseau implements Cloneable {
 		}
 		return null;
 	}
+	
+	public void supprimerStation(Station station)
+	{
+		stations.remove(station);
+	}
 
 	/**
 	 * @return Liste des stations reliées à aucune ligne
@@ -348,17 +353,17 @@ public class Reseau implements Cloneable {
 
 	/**
 	 * Evalue l'efficacité du réseau en simulant les trajets des voyageurs.
+	 * @param stationsIgnorees Stations à ne pas prendre en compte.
 	 * @return Moyenne des temps de parcours des voyageurs
 	 */
-	public double evaluer() {
-		List<Station> stationsIsolees = stationsIsolees(); // On veut les ignorer
-		calculerCheminsCourts(stationsIsolees);
+	public double evaluer(List<Station> stationsIgnorees) {
+		calculerCheminsCourts(stationsIgnorees);
 
 		// Initialisation des trajets
 		List<Voyageur> voyageursCalcules = new ArrayList<Voyageur>();
 		for (Voyageur v : voyageurs)
 		{
-			if (!stationsIsolees.contains(v.getOrigine()) && ! stationsIsolees.contains(v.getDestination()))
+			if (!stationsIgnorees.contains(v.getOrigine()) && ! stationsIgnorees.contains(v.getDestination()))
 			{
 				v.initialiserTrajet();
 				voyageursCalcules.add(v);
