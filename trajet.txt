@@ -1,9 +1,0 @@
-villejuif ivry 9
-paris villejuif 24
-paris ivry 12
-ddd vitry 11
-ccc villejuif 30
-eee bbb 4
-bbb ivry 8
-ddd fff 2
-paris fff 50
